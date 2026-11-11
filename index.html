@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APK para TV Box</title>
+<style>
+  :root {
+    --fondo: #0e1c28;
+    --panel: #183044;
+    --panel-foco: #21435e;
+    --texto: #eaf2f6;
+    --suave: #9fb6c4;
+    --foco: #ffd23f;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--texto);
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    min-height: 100vh;
+    padding: 32px 24px 56px;
+  }
+  main { max-width: 1000px; margin: 0 auto; }
+  h1 { font-size: 2.2rem; margin: 0 0 8px; }
+  .sub { color: var(--suave); font-size: 1.15rem; margin: 0 0 28px; max-width: 60ch; line-height: 1.45; }
+  #aviso {
+    display: none;
+    background: #3a2a10;
+    border: 2px solid var(--foco);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin: 0 0 24px;
+    font-size: 1.05rem;
+    line-height: 1.45;
+  }
+  #estado {
+    min-height: 1.6em;
+    margin: 0 0 20px;
+    color: var(--foco);
+    font-size: 1.15rem;
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  a.apk {
+    display: block;
+    padding: 22px 24px;
+    background: var(--panel);
+    color: var(--texto);
+    text-decoration: none;
+    font-size: 1.4rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 3px solid transparent;
+  }
+  a.apk small {
+    display: block;
+    margin-top: 6px;
+    font-size: 0.95rem;
+    font-weight: 400;
+    color: var(--suave);
+  }
+  a.apk:hover,
+  a.apk:focus {
+    outline: none;
+    border-color: var(--foco);
+    background: var(--panel-foco);
+  }
+  @media (max-width: 520px) {
+    h1 { font-size: 1.7rem; }
+    a.apk { font-size: 1.2rem; }
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>APK para TV Box</h1>
+  <p class="sub">Elegí una aplicación con el control remoto. Se descarga sola; después abrila desde la carpeta de descargas para instalarla.</p>
+
+  <div id="aviso"></div>
+  <div id="estado" role="status" aria-live="polite"></div>
+  <ul id="lista"></ul>
+</main>
+
+<script>
+  /* ============================================================
+     CONFIGURACIÓN: es lo único que tenés que editar.
+     ============================================================ */
+  var CONFIG = {
+    usuario: "chipeadoronline",   // tu usuario de GitHub
+    repo:    "tvbox",        // nombre del repositorio
+    tag:     "v1",           // nombre de la Release donde subiste las APK
+    apps: [
+      // nombre = lo que se ve en el botón
+      // archivo = nombre EXACTO del archivo .apk en la Release
+      { nombre: "App 1",  archivo: "app1.apk" },
+      { nombre: "App 2",  archivo: "app2.apk" },
+      { nombre: "App 3",  archivo: "app3.apk" },
+      { nombre: "App 4",  archivo: "app4.apk" },
+      { nombre: "App 5",  archivo: "app5.apk" },
+      { nombre: "App 6",  archivo: "app6.apk" },
+      { nombre: "App 7",  archivo: "app7.apk" },
+      { nombre: "App 8",  archivo: "app8.apk" },
+      { nombre: "App 9",  archivo: "app9.apk" },
+      { nombre: "App 10", archivo: "app10.apk" }
+    ]
+  };
+  /* ============================================================ */
+
+  (function () {
+    var lista = document.getElementById("lista");
+    var estado = document.getElementById("estado");
+    var aviso = document.getElementById("aviso");
+
+    if (CONFIG.usuario === "TU_USUARIO" || CONFIG.repo === "TU_REPO") {
+      aviso.style.display = "block";
+      aviso.textContent = "Falta configurar la página: editá usuario, repo y la lista de APK al principio del script.";
+    }
+
+    var base = "https://github.com/" +
+      encodeURIComponent(CONFIG.usuario) + "/" +
+      encodeURIComponent(CONFIG.repo) + "/releases/download/" +
+      encodeURIComponent(CONFIG.tag) + "/";
+
+    CONFIG.apps.forEach(function (app) {
+      var li = document.createElement("li");
+      var a = document.createElement("a");
+      a.className = "apk";
+      a.href = base + encodeURIComponent(app.archivo);
+      a.setAttribute("download", app.archivo);
+
+      a.appendChild(document.createTextNode(app.nombre));
+      var chico = document.createElement("small");
+      chico.textContent = "Descargar";
+      a.appendChild(chico);
+
+      a.addEventListener("click", function () {
+        estado.textContent = "Descargando " + app.nombre + ". Cuando termine, abrila desde Descargas para instalarla.";
+      });
+
+      li.appendChild(a);
+      lista.appendChild(li);
+    });
+
+    var primero = lista.querySelector("a.apk");
+    if (primero) { primero.focus(); }
+  })();
+</script>
+</body>
+</html>
