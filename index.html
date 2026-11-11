@@ -85,6 +85,31 @@
     border-color: var(--foco);
     background: var(--panel-foco);
   }
+  #pie {
+    margin-top: 44px;
+    padding-top: 24px;
+    border-top: 1px solid var(--panel);
+    text-align: center;
+  }
+  #pie p { color: var(--suave); font-size: 1.05rem; margin: 0 0 14px; }
+  #pie .alias { color: var(--texto); font-size: 1.3rem; font-weight: 600; margin: 14px 0 0; }
+  a.dona {
+    display: inline-block;
+    padding: 16px 32px;
+    background: var(--panel);
+    color: var(--texto);
+    text-decoration: none;
+    font-size: 1.3rem;
+    font-weight: 600;
+    border-radius: 12px;
+    border: 3px solid transparent;
+  }
+  a.dona:hover,
+  a.dona:focus {
+    outline: none;
+    border-color: var(--foco);
+    background: var(--panel-foco);
+  }
   @media (max-width: 520px) {
     h1 { font-size: 1.7rem; }
     a.apk .nombre { font-size: 1.2rem; }
@@ -99,6 +124,7 @@
   <div id="aviso"></div>
   <div id="estado" role="status" aria-live="polite"></div>
   <ul id="lista"></ul>
+  <footer id="pie" style="display:none"></footer>
 </main>
 
 <script>
@@ -138,6 +164,16 @@
       "014.-.xrtn.apk": "XRTN",
       "015.-.XuperNoF_emagoplay_14.sept.apk": "Xuper NoF",
       "016.-.SendFiles.apk": "SendFiles"
+    },
+
+    // Donaciones (opcional): botón en el pie de la página.
+    // url: link de donación (Mercado Pago, Cafecito, PayPal, etc.). Vacío = no se muestra el botón.
+    // alias: opcional, por ejemplo tu alias de Mercado Pago; se muestra como texto debajo.
+    // Si dejás url y alias vacíos, el pie no aparece.
+    donacion: {
+      url: "",
+      texto: "Apoyar este proyecto",
+      alias: ""
     },
 
     // Respaldo (opcional): solo se usa si la página no puede leer la Release.
@@ -258,6 +294,32 @@
       }
     }
 
+    function armarPie() {
+      var d = CONFIG.donacion;
+      if (!d || (!d.url && !d.alias)) { return; }
+      var pie = document.getElementById("pie");
+      if (d.url) {
+        var p = document.createElement("p");
+        p.textContent = "Si esta página te sirve, podés colaborar con una donación.";
+        pie.appendChild(p);
+        var b = document.createElement("a");
+        b.className = "dona";
+        b.href = d.url;
+        b.target = "_blank";
+        b.rel = "noopener";
+        b.textContent = d.texto || "Donar";
+        pie.appendChild(b);
+      }
+      if (d.alias) {
+        var al = document.createElement("p");
+        al.className = "alias";
+        al.textContent = "Alias: " + d.alias;
+        pie.appendChild(al);
+      }
+      pie.style.display = "block";
+    }
+    armarPie();
+
     estado.textContent = "Cargando lista de aplicaciones...";
 
     var xhr = new XMLHttpRequest();
@@ -294,7 +356,7 @@
     document.addEventListener("keydown", function (e) {
       var k = e.keyCode;
       if (k < 37 || k > 40) { return; }
-      var links = [].slice.call(lista.querySelectorAll("a.apk"));
+      var links = [].slice.call(document.querySelectorAll("a.apk, a.dona"));
       if (!links.length) { return; }
       var act = document.activeElement;
       if (links.indexOf(act) < 0) {
