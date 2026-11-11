@@ -22,7 +22,7 @@
     min-height: 100vh;
     padding: 32px 24px 56px;
   }
-  main { max-width: 1000px; margin: 0 auto; }
+  main { max-width: 1100px; margin: 0 auto; }
   h1 { font-size: 2.2rem; margin: 0 0 8px; }
   .sub { color: var(--suave); font-size: 1.15rem; margin: 0 0 28px; max-width: 60ch; line-height: 1.45; }
   #aviso {
@@ -46,19 +46,31 @@
     padding: 0;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
     gap: 16px;
   }
   a.apk {
     display: block;
-    padding: 22px 24px;
     background: var(--panel);
     color: var(--texto);
     text-decoration: none;
-    font-size: 1.4rem;
-    font-weight: 600;
     border-radius: 12px;
     border: 3px solid transparent;
+    overflow: hidden;
+  }
+  a.apk img.banner {
+    display: block;
+    width: 100%;
+    height: 130px;
+    object-fit: cover;
+    background: #0b1620;
+  }
+  a.apk .txt { padding: 18px 20px 20px; }
+  a.apk .nombre {
+    display: block;
+    font-size: 1.4rem;
+    font-weight: 600;
+    word-break: break-word;
   }
   a.apk small {
     display: block;
@@ -75,7 +87,7 @@
   }
   @media (max-width: 520px) {
     h1 { font-size: 1.7rem; }
-    a.apk { font-size: 1.2rem; }
+    a.apk .nombre { font-size: 1.2rem; }
   }
 </style>
 </head>
@@ -92,25 +104,44 @@
 <script>
   /* ============================================================
      CONFIGURACIÓN: es lo único que tenés que editar.
+     La lista de APK se arma SOLA leyendo la Release de GitHub:
+     si subís o sacás una APK de la Release, la página se actualiza.
      ============================================================ */
   var CONFIG = {
     usuario: "chipeadoronline",   // tu usuario de GitHub
-    repo:    "tvbox",        // nombre del repositorio
-    tag:     "v1",           // nombre de la Release donde subiste las APK
-    apps: [
-      // nombre = lo que se ve en el botón
-      // archivo = nombre EXACTO del archivo .apk en la Release
-      { nombre: "App 1",  archivo: "app1.apk" },
-      { nombre: "App 2",  archivo: "app2.apk" },
-      { nombre: "App 3",  archivo: "app3.apk" },
-      { nombre: "App 4",  archivo: "app4.apk" },
-      { nombre: "App 5",  archivo: "app5.apk" },
-      { nombre: "App 6",  archivo: "app6.apk" },
-      { nombre: "App 7",  archivo: "app7.apk" },
-      { nombre: "App 8",  archivo: "app8.apk" },
-      { nombre: "App 9",  archivo: "app9.apk" },
-      { nombre: "App 10", archivo: "app10.apk" }
-    ]
+    repo:    "tvbox",             // nombre del repositorio
+    tag:     "v1",                // nombre de la Release donde subiste las APK
+
+    // Banners (opcional): carpeta del repo con una imagen por app.
+    // La imagen se llama como el nombre del botón, en minúsculas y con guiones.
+    // Ejemplo: botón "Disney+"  ->  banners/disney.png  (o .jpg)
+    // Si falta la imagen, el botón sale igual, solo con el nombre.
+    carpetaBanners: "banners",
+    extensionesBanners: ["png", "jpg"],
+
+    // Nombres lindos (opcional). Si no ponés nada, se usa el nombre del archivo.
+    // Formato:  "archivo.apk": "Nombre que se ve en el botón",
+    nombres: {
+      "001.-.FCTV33_Premium_v3.0.318.apk": "FCTV33 Premium",
+      "002.-.Magma.Sin.VPN.apk": "Magma Sin VPN",
+      "003.-.AutoVpn.aaa.28-05.apk": "AutoVpn",
+      "004.-.Urban_VPN-FULL1.0.95.apk": "Urban VPN",
+      "005.-.Xuper.Hydra.Nuevo.HDR.apk": "Xuper Hydra HDR",
+      "007.-.MagLink-Flow-TV.apk": "MagLink Flow TV",
+      "007.-.smarttube_stable.apk": "SmartTube",
+      "008.-.X-plore.Pro.v4.48.05.-.androforever.com.apk": "X-plore Pro",
+      "009.-.downloader.apk": "Downloader",
+      "010.-.T.e.l.e.App.1.7.26.apk": "Tele App",
+      "011.-.GeeSports_V3.apk": "GeeSports",
+      "012.-.Disney.+.apk": "Disney+",
+      "013.-.SaltamontesLite-v1.1.0.apk": "Saltamontes Lite",
+      "014.-.xrtn.apk": "XRTN",
+      "015.-.XuperNoF_emagoplay_14.sept.apk": "Xuper NoF"
+    },
+
+    // Respaldo (opcional): solo se usa si la página no puede leer la Release.
+    // Formato:  { archivo: "app1.apk" },
+    apps: []
   };
   /* ============================================================ */
 
@@ -121,7 +152,7 @@
 
     if (CONFIG.usuario === "TU_USUARIO" || CONFIG.repo === "TU_REPO") {
       aviso.style.display = "block";
-      aviso.textContent = "Falta configurar la página: editá usuario, repo y la lista de APK al principio del script.";
+      aviso.textContent = "Falta configurar la página: editá usuario y repo al principio del script.";
     }
 
     var base = "https://github.com/" +
@@ -129,28 +160,166 @@
       encodeURIComponent(CONFIG.repo) + "/releases/download/" +
       encodeURIComponent(CONFIG.tag) + "/";
 
-    CONFIG.apps.forEach(function (app) {
+    var urlApi = "https://api.github.com/repos/" +
+      encodeURIComponent(CONFIG.usuario) + "/" +
+      encodeURIComponent(CONFIG.repo) + "/releases/tags/" +
+      encodeURIComponent(CONFIG.tag);
+
+    function sinExtension(archivo) {
+      return archivo.replace(/\.apk$/i, "");
+    }
+
+    function nombreLindo(archivo) {
+      if (CONFIG.nombres && CONFIG.nombres[archivo]) { return CONFIG.nombres[archivo]; }
+      var n = sinExtension(archivo).replace(/[_\-.]+/g, " ").replace(/\s+/g, " ").trim();
+      if (!n) { n = archivo; }
+      return n.charAt(0).toUpperCase() + n.slice(1);
+    }
+
+    function nombreBanner(archivo) {
+      var n = nombreLindo(archivo).toLowerCase();
+      try { n = n.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); } catch (e) {}
+      n = n.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+      return n || "app";
+    }
+
+    function pesoTexto(bytes) {
+      if (!bytes) { return ""; }
+      return " · " + (bytes / 1048576).toFixed(1) + " MB";
+    }
+
+    function crearBoton(app) {
+      var nombre = nombreLindo(app.archivo);
+
       var li = document.createElement("li");
       var a = document.createElement("a");
       a.className = "apk";
       a.href = base + encodeURIComponent(app.archivo);
       a.setAttribute("download", app.archivo);
 
-      a.appendChild(document.createTextNode(app.nombre));
+      if (CONFIG.carpetaBanners) {
+        var img = document.createElement("img");
+        img.className = "banner";
+        img.alt = "";
+        var exts = CONFIG.extensionesBanners || ["png"];
+        var intento = 0;
+        var rutaBanner = CONFIG.carpetaBanners + "/" + encodeURIComponent(nombreBanner(app.archivo)) + ".";
+        img.onerror = function () {
+          intento++;
+          if (intento < exts.length) {
+            img.src = rutaBanner + exts[intento];
+          } else if (img.parentNode) {
+            img.parentNode.removeChild(img);
+          }
+        };
+        img.src = rutaBanner + exts[0];
+        a.appendChild(img);
+      }
+
+      var txt = document.createElement("div");
+      txt.className = "txt";
+
+      var spanNombre = document.createElement("span");
+      spanNombre.className = "nombre";
+      spanNombre.textContent = nombre;
+      txt.appendChild(spanNombre);
+
       var chico = document.createElement("small");
-      chico.textContent = "Descargar";
-      a.appendChild(chico);
+      chico.textContent = "Descargar" + pesoTexto(app.size);
+      txt.appendChild(chico);
+
+      a.appendChild(txt);
 
       a.addEventListener("click", function () {
-        estado.textContent = "Descargando " + app.nombre + ". Cuando termine, abrila desde Descargas para instalarla.";
+        estado.textContent = "Descargando " + nombre + ". Cuando termine, abrila desde Descargas para instalarla.";
       });
 
       li.appendChild(a);
       lista.appendChild(li);
-    });
+    }
 
-    var primero = lista.querySelector("a.apk");
-    if (primero) { primero.focus(); }
+    function mostrar(apps) {
+      lista.innerHTML = "";
+      apps.forEach(crearBoton);
+      var primero = lista.querySelector("a.apk");
+      if (primero) { primero.focus(); }
+    }
+
+    function usarRespaldo(motivo) {
+      var respaldo = (CONFIG.apps || []).map(function (x) {
+        return { archivo: x.archivo, size: 0 };
+      });
+      if (respaldo.length) {
+        estado.textContent = "";
+        mostrar(respaldo);
+      } else {
+        estado.textContent = motivo;
+      }
+    }
+
+    estado.textContent = "Cargando lista de aplicaciones...";
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", urlApi, true);
+    xhr.setRequestHeader("Accept", "application/vnd.github+json");
+    xhr.onreadystatechange = function () {
+      if (xhr.readyState !== 4) { return; }
+      if (xhr.status !== 200) {
+        usarRespaldo("No se pudo leer la lista de GitHub (revisá usuario, repo y tag, y que la Release esté publicada).");
+        return;
+      }
+      var datos;
+      try { datos = JSON.parse(xhr.responseText); } catch (e) { datos = null; }
+      var assets = (datos && datos.assets) ? datos.assets : [];
+      var apps = assets
+        .filter(function (as) { return /\.apk$/i.test(as.name); })
+        .map(function (as) { return { archivo: as.name, size: as.size }; })
+        .sort(function (x, y) {
+          return x.archivo.toLowerCase() < y.archivo.toLowerCase() ? -1 : 1;
+        });
+      if (!apps.length) {
+        usarRespaldo("La Release no tiene archivos .apk todavía.");
+        return;
+      }
+      estado.textContent = "";
+      mostrar(apps);
+    };
+    xhr.onerror = function () {
+      usarRespaldo("No se pudo conectar con GitHub. Revisá la conexión a internet.");
+    };
+    xhr.send();
+
+    /* Navegación con flechas del control remoto (OK = Enter abre el enlace). */
+    document.addEventListener("keydown", function (e) {
+      var k = e.keyCode;
+      if (k < 37 || k > 40) { return; }
+      var links = [].slice.call(lista.querySelectorAll("a.apk"));
+      if (!links.length) { return; }
+      var act = document.activeElement;
+      if (links.indexOf(act) < 0) {
+        links[0].focus();
+        e.preventDefault();
+        return;
+      }
+      var r = act.getBoundingClientRect();
+      var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+      var mejor = null, mejorD = 1e9;
+      links.forEach(function (l) {
+        if (l === act) { return; }
+        var q = l.getBoundingClientRect();
+        var dx = (q.left + q.width / 2) - cx;
+        var dy = (q.top + q.height / 2) - cy;
+        var horiz = (k === 37 || k === 39);
+        var ok = (k === 37) ? dx < -5 : (k === 39) ? dx > 5 : (k === 38) ? dy < -5 : dy > 5;
+        if (!ok) { return; }
+        var principal = horiz ? Math.abs(dx) : Math.abs(dy);
+        var cruzado = horiz ? Math.abs(dy) : Math.abs(dx);
+        var d = principal + cruzado * 3;
+        if (d < mejorD) { mejorD = d; mejor = l; }
+      });
+      if (mejor) { mejor.focus(); }
+      e.preventDefault();
+    });
   })();
 </script>
 </body>
