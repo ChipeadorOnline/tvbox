@@ -6,13 +6,13 @@
 <title>APK para TV Box - ChipeadorOnline</title>
 <style>
   :root {
-    --fondo: #091118;
-    --panel: #132231;
-    --panel-foco: #1d364f;
-    --texto: #f0f4f8;
-    --suave: #8ba2b8;
+    --fondo: #070e14;
+    --panel: #111d28;
+    --panel-foco: #192d40;
+    --texto: #f1f5f9;
+    --suave: #839bb0;
     --foco: #38bdf8;
-    --sombra: rgba(0, 0, 0, 0.5);
+    --acento: #0ea5e9;
   }
   * { box-sizing: border-box; }
   html, body { margin: 0; }
@@ -22,17 +22,19 @@
     font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     min-height: 100vh;
     padding: 40px 32px 64px;
-    background-image: radial-gradient(circle at 50% 0%, #102336 0%, var(--fondo) 70%);
+    background-image: 
+      radial-gradient(circle at 15% 15%, #102638 0%, transparent 40%),
+      radial-gradient(circle at 85% 85%, #0c1a26 0%, transparent 40%);
   }
   main { max-width: 1200px; margin: 0 auto; }
   
   header {
-    margin-bottom: 36px;
+    margin-bottom: 32px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
     padding-bottom: 20px;
   }
-  h1 { font-size: 2.5rem; margin: 0 0 8px; font-weight: 700; letter-spacing: -0.5px; color: #fff; }
-  .sub { color: var(--suave); font-size: 1.2rem; margin: 0; max-width: 70ch; line-height: 1.5; }
+  h1 { font-size: 2.4rem; margin: 0 0 8px; font-weight: 700; color: #fff; letter-spacing: -0.5px; }
+  .sub { color: var(--suave); font-size: 1.15rem; margin: 0; line-height: 1.5; max-width: 70ch; }
 
   #aviso {
     display: none;
@@ -47,82 +49,57 @@
     min-height: 1.8em;
     margin: 0 0 24px;
     color: var(--foco);
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     font-weight: 500;
   }
 
-  /* Grilla de aplicaciones */
+  /* Grilla de aplicaciones perfectamente simétrica */
   ul {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 20px;
   }
 
   a.apk {
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     background: var(--panel);
     color: var(--texto);
     text-decoration: none;
     border-radius: 16px;
-    border: 3px solid rgba(255, 255, 255, 0.04);
-    overflow: hidden;
-    box-shadow: 0 10px 25px -5px var(--sombra);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    padding: 24px;
+    min-height: 155px; /* Altura fija para mantener todos los cubos idénticos */
+    box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.4);
     transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
   }
 
-  /* Contenedor de la carátula automática */
-  .banner-box {
-    width: 100%;
-    height: 140px;
-    background: #0b1620;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-  }
-
-  a.apk img.banner {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  /* Estilo si la imagen falla o se genera un ícono por defecto */
-  .avatar-placeholder {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: var(--suave);
-    background: linear-gradient(135deg, #1b3651, #0e1c28);
-    width: 100%;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-transform: uppercase;
-  }
-
-  a.apk .txt { 
-    padding: 20px; 
+  .contenido-tarjeta {
     display: flex;
     flex-direction: column;
-    flex-grow: 1;
     justify-content: space-between;
+    height: 100%;
   }
 
   a.apk .nombre {
     display: block;
     font-size: 1.25rem;
     font-weight: 600;
-    line-height: 1.35;
+    line-height: 1.4;
     word-break: break-word;
-    margin-bottom: 12px;
+    color: #fff;
+    margin-bottom: 16px;
+  }
+
+  .pie-tarjeta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
   }
 
   a.apk small {
@@ -133,21 +110,30 @@
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--suave);
-    align-self: flex-start;
   }
 
-  /* Efecto Foco / Hover ideal para control remoto en TV Box */
+  .icono-descarga {
+    font-size: 1.1rem;
+    color: var(--foco);
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Efecto Foco / Hover optimizado para control remoto en TV Box */
   a.apk:hover,
   a.apk:focus {
     outline: none;
     border-color: var(--foco);
     background: var(--panel-foco);
     transform: translateY(-4px);
-    box-shadow: 0 15px 30px -5px rgba(56, 189, 248, 0.3);
+    box-shadow: 0 15px 30px -5px rgba(56, 189, 248, 0.25);
   }
 
-  a.apk:hover img.banner {
-    transform: scale(1.05);
+  a.apk:hover .icono-descarga,
+  a.apk:focus .icono-descarga {
+    color: #fff;
   }
 
   /* Pie de página y donaciones */
@@ -267,23 +253,9 @@
       return (bytes / 1048576).toFixed(1) + " MB";
     }
 
-    // Generador automático de carátulas inteligentes basadas en la web (Favicons o Logos públicos)
-    function obtenerCaratulaUrl(nombreApp) {
-      var n = nombreApp.toLowerCase();
-      // Mapeo automático de dominios conocidos para extraer logos oficiales en alta calidad de internet
-      if (n.includes("disney")) return "https://www.google.com/s2/favicons?domain=disneyplus.com&sz=128";
-      if (n.includes("smarttube")) return "https://github.com/yuliskov/SmartTube/raw/master/tv/src/main/res/mipmap-xxxhdpi/ic_launcher.png";
-      if (n.includes("urban") || n.includes("vpn")) return "https://www.google.com/s2/favicons?domain=urban-vpn.com&sz=128";
-      if (n.includes("downloader")) return "https://www.google.com/s2/favicons?domain=aftvnews.com&sz=128";
-      if (n.includes("x-plore")) return "https://www.google.com/s2/favicons?domain=lonelycatgames.com&sz=128";
-      
-      // Si no encuentra una específica, busca un icono genérico basado en palabras clave o usa Clearbit Logo API
-      var dominioLimpio = n.replace(/[^a-z0-9]/g, "") + ".com";
-      return "https://logo.clearbit.com/" + dominioLimpio;
-    }
-
     function crearBoton(app) {
       var nombre = nombreLindo(app.archivo);
+      var peso = pesoTexto(app.size);
 
       var li = document.createElement("li");
       var a = document.createElement("a");
@@ -291,40 +263,31 @@
       a.href = base + encodeURIComponent(app.archivo);
       a.setAttribute("download", app.archivo);
 
-      // Contenedor visual superior (Banner / Carátula)
-      var bannerBox = document.createElement("div");
-      bannerBox.className = "banner-box";
-
-      var img = document.createElement("img");
-      img.className = "banner";
-      img.alt = nombre;
-      img.src = obtenerCaratulaUrl(nombre);
-
-      // Si falla la carga del logo de internet, mostramos una letra inicial elegante de respaldo
-      img.onerror = function () {
-        bannerBox.innerHTML = '<div class="avatar-placeholder">' + nombre.charAt(0) + '</div>';
-      };
-
-      bannerBox.appendChild(img);
-      a.appendChild(bannerBox);
-
-      // Contenedor de texto inferior
-      var txt = document.createElement("div");
-      txt.className = "txt";
+      // Estructura interna para garantizar bloques idénticos y alineados
+      var contenedor = document.createElement("div");
+      contenedor.className = "contenido-tarjeta";
 
       var spanNombre = document.createElement("span");
       spanNombre.className = "nombre";
       spanNombre.textContent = nombre;
-      txt.appendChild(spanNombre);
+      contenedor.appendChild(spanNombre);
 
-      var peso = pesoTexto(app.size);
+      var pieTarjeta = document.createElement("div");
+      pieTarjeta.className = "pie-tarjeta";
+
       if (peso) {
         var chico = document.createElement("small");
         chico.textContent = peso;
-        txt.appendChild(chico);
+        pieTarjeta.appendChild(chico);
       }
 
-      a.appendChild(txt);
+      var icono = document.createElement("span");
+      icono.className = "icono-descarga";
+      icono.innerHTML = "Descargar ↓";
+      pieTarjeta.appendChild(icono);
+
+      contenedor.appendChild(pieTarjeta);
+      a.appendChild(contenedor);
 
       a.addEventListener("click", function () {
         estado.textContent = "Descargando " + nombre + ". Cuando termine, abrila desde Descargas para instalarla.";
