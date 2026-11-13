@@ -135,18 +135,14 @@
      ============================================================ */
   var CONFIG = {
     usuario: "chipeadoronline",   // tu usuario de GitHub
-    repo:    "tvbox",             // nombre del repositorio
-    tag:     "v1",                // nombre de la Release donde subiste las APK
+    repo:    "tvbox",               // nombre del repositorio
+    tag:     "v1",                  // nombre de la Release donde subiste las APK
 
     // Banners (opcional): carpeta del repo con una imagen por app.
-    // La imagen se llama como el nombre del botón, en minúsculas y con guiones.
-    // Ejemplo: botón "Disney+"  ->  banners/disney.png  (o .jpg)
-    // Si falta la imagen, el botón sale igual, solo con el nombre.
     carpetaBanners: "banners",
     extensionesBanners: ["png", "jpg"],
 
-    // Nombres lindos (opcional). Si no ponés nada, se usa el nombre del archivo.
-    // Formato:  "archivo.apk": "Nombre que se ve en el botón",
+    // Nombres lindos: acá queda perfectamente enlazado el 018
     nombres: {
       "001.-.FCTV33_Premium_v3.0.318.apk": "FCTV33 Premium",
       "002.-.Magma.Sin.VPN.apk": "Magma Sin VPN",
@@ -165,21 +161,15 @@
       "015.-.XuperNoF_emagoplay_14.sept.apk": "Xuper NoF",
       "016.-.SendFiles.apk": "SendFiles",
       "017.-.XuperOficial4.99.20.apk": "Xuper Oficial usa vpn",
-      "018.-.XuperXao25.apk": "XuperXao25 sin Vpn Arg",
+      "018.-.XuperXao25.apk": "XuperXao25 sin Vpn Arg"
     },
 
-    // Donaciones (opcional): botón en el pie de la página.
-    // url: link de donación (Mercado Pago, Cafecito, PayPal, etc.). Vacío = no se muestra el botón.
-    // alias: opcional, por ejemplo tu alias de Mercado Pago; se muestra como texto debajo.
-    // Si dejás url y alias vacíos, el pie no aparece.
     donacion: {
       url: "",
       texto: "Apoyar este proyecto",
       alias: "chipeadoronline.mp"
     },
 
-    // Respaldo (opcional): solo se usa si la página no puede leer la Release.
-    // Formato:  { archivo: "app1.apk" },
     apps: []
   };
   /* ============================================================ */
