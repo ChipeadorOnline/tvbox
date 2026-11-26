@@ -1,26 +1,27 @@
-# API de licencias
+# API de licencias (sin base de datos)
 
-Servidor mínimo con Express para usuarios, claves de acceso y abono mensual.
+La clave contiene la fecha de vencimiento y una firma HMAC. El servidor no
+guarda nada: por eso funciona en hosting gratuito aunque se reinicie.
 
 ## Arrancar
 
 ```bash
 cd server
 npm install
-cp .env.example .env   # editá los valores
+cp .env.example .env
+# editá ADMIN_TOKEN y LICENSE_PEPPER
 npm start
 ```
 
 Variables:
 
-- `ADMIN_TOKEN`: token para crear/renovar/revocar licencias (obligatorio).
-- `LICENSE_PEPPER`: secreto para hashear las claves. **No lo cambies después** o todas las claves dejarán de funcionar.
-- `WEBHOOK_TOKEN`: secreto del webhook de pago.
-- `DATA_FILE`: archivo JSON donde se guardan las licencias.
+- `ADMIN_TOKEN`: token para emitir claves (obligatorio).
+- `LICENSE_PEPPER`: secreto con el que se firman las claves. **No lo cambies nunca** o todas las claves emitidas dejarán de funcionar.
+- `PORT`: por defecto 3000.
 
 ## Endpoints
 
-### Verificar clave (usa la app)
+### Verificar clave (la usa la app)
 
 `POST /api/license/validate`
 
@@ -31,35 +32,23 @@ Variables:
 Respuesta:
 
 ```json
-{ "active": true, "username": "juan", "expiresAt": "2026-12-26T00:00:00.000Z", "plan": "mensual" }
+{ "active": true, "expiresAt": "2026-12-26T00:00:00.000Z", "plan": "mensual" }
 ```
 
-### Crear licencia (admin)
+La clave se acepta en mayúsculas/minúsculas y con o sin guiones.
+
+### Emitir clave (admin)
 
 ```bash
-curl -X POST http://localhost:3000/api/admin/licenses \
+curl -X POST https://TU_API/api/admin/licenses \
   -H "Authorization: Bearer TU_ADMIN_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"username":"juan","days":30}'
 ```
 
-### Renovar / revocar
+Devuelve `username`, `key`, `expiresAt` y `plan`. Para renovar un abono,
+emití una clave nueva con 30 días más y entregala al usuario.
 
-```bash
-curl -X POST http://localhost:3000/api/admin/licenses/<ID>/renew \
-  -H "Authorization: Bearer TU_ADMIN_TOKEN" \
-  -H "Content-Type: application/json" \
-  -d '{"days":30}'
-```
-
-### Webhook de pago
-
-`POST /api/webhook/payment` con header `x-webhook-token` y body
-`{"key":"ABCD-EFGH-IJKL-MNOP","days":30}`. Conectalo al webhook de tu
-proveedor de pagos para renovar automáticamente.
-
-## Producción
-
-- Poné la API detrás de HTTPS (nginx + Let's Encrypt o Cloudflare Tunnel).
-- Compilá la app con `--dart-define=API_URL=https://tu-dominio.com`.
-- Hacé backup de `data/licenses.json` y guardá `LICENSE_PEPPER` de forma segura.
+No hay base de datos, por lo que no hay endpoints de revocar/listar. Si
+necesitás revocar claves, cambiá `LICENSE_PEPPER` (invalida todas) o pasá a
+una versión con base de datos persistente.
