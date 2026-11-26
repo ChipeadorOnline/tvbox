@@ -8,13 +8,16 @@ class InstalledInfo {
     required this.installed,
     required this.versionCode,
     required this.versionName,
+    this.packageName = '',
   });
 
+  final String packageName;
   final bool installed;
   final int versionCode;
   final String versionName;
 
   factory InstalledInfo.fromMap(Map<dynamic, dynamic> map) => InstalledInfo(
+        packageName: (map['packageName'] as String?) ?? '',
         installed: map['installed'] == true,
         versionCode: (map['versionCode'] as num?)?.toInt() ?? 0,
         versionName: (map['versionName'] as String?) ?? '',

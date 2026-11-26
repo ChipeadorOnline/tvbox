@@ -42,7 +42,7 @@ La clave se escribe en mayúsculas y con guiones (`XXXX-XXXX-XXXX-XXXX`). La app
 la formatea sola y el servidor la acepta con o sin guiones.
 
 Clave de prueba vigente hasta el 2026-12-26: `PN2B-9XBY-DJVR-KTSN`
-Link corto del APK para el TV Box: `https://is.gd/Qnwtg4`
+Link corto del APK para el TV Box: `https://is.gd/kKzbYW`
 
 Crear una clave de prueba:
 
@@ -106,7 +106,7 @@ copia en `apk/tvbox-updater-release.apk`.
 > **No subas ese archivo a GitHub.** La huella del certificado es
 > `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
 > APK publicado por GitHub Actions:
-> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.7/app-release.apk
+> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.8/app-release.apk
 >
 > Está compilado apuntando a la API fija de Render
 > `https://tvbox-license.onrender.com`, así que **no depende de que esta PC esté

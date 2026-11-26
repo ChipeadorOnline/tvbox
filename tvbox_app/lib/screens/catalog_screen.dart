@@ -10,6 +10,7 @@ import '../services/download_service.dart';
 import '../services/install_service.dart';
 import '../services/license_service.dart';
 import '../tv_navigation.dart';
+import 'diagnostic_screen.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
@@ -52,6 +53,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   }
 
   Future<void> _reloadInstalled() async {
+    final own = await widget.installService.ownVersion();
     final entries = await Future.wait(
       _catalog.apps.map(
         (app) => widget.installService.installedInfo(app.packageName),
@@ -61,7 +63,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
     setState(() {
       _installed.clear();
       for (var i = 0; i < _catalog.apps.length; i++) {
-        _installed[_catalog.apps[i].id] = entries[i];
+        final app = _catalog.apps[i];
+        // Para esta app usamos siempre la versión propia: evita depender de
+        // restricciones de visibilidad de paquetes en algunos TV Box.
+        _installed[app.id] = own.installed && app.packageName == own.packageName
+            ? own
+            : entries[i];
       }
     });
   }
@@ -112,6 +119,19 @@ class _CatalogScreenState extends State<CatalogScreen> {
     if (oldWidget.license != widget.license) {
       setState(() => _license = widget.license);
     }
+  }
+
+  void _openDiagnostic() {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DiagnosticScreen(
+          licenseService: widget.licenseService,
+          installService: widget.installService,
+          catalog: _catalog,
+          version: 'v1.0.8',
+        ),
+      ),
+    );
   }
 
   Future<void> _refresh() async {
@@ -222,6 +242,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
             icon: const Icon(Icons.refresh),
           ),
           TextButton.icon(
+            onPressed: _openDiagnostic,
+            icon: const Icon(Icons.info_outline, size: 20),
+            label: const Text('Diagnóstico', style: TextStyle(fontSize: 18)),
+            style: TvStyles.button(const Color(0xFF334155)).copyWith(
+              minimumSize: WidgetStateProperty.all(const Size(140, 44)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          TextButton.icon(
             onPressed: () => SystemNavigator.pop(),
             icon: const Icon(Icons.exit_to_app, size: 20),
             label: const Text('Salir', style: TextStyle(fontSize: 18)),
@@ -288,10 +317,17 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               versionName: '',
                             );
                         return Card(
-                          color: const Color(0xFF111D28),
+                          color: info.installed
+                              ? const Color(0xFF10281C)
+                              : const Color(0xFF111D28),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
-                            side: const BorderSide(color: Color(0xFF24384A)),
+                            side: BorderSide(
+                              color: info.installed
+                                  ? const Color(0xFF166534)
+                                  : const Color(0xFF24384A),
+                              width: info.installed ? 2 : 1,
+                            ),
                           ),
                           child: Padding(
                             padding: const EdgeInsets.all(18),
