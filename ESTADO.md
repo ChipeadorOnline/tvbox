@@ -50,6 +50,10 @@ Vence el 26/12/2026. Se acepta con guiones, sin guiones y en minúsculas.
 Contiene: keystore, contraseñas del keystore, `ADMIN_TOKEN` y `LICENSE_PEPPER`
 de Render. Si se pierde el `LICENSE_PEPPER`, las claves emitidas dejan de funcionar.
 
+Render debe tener **siempre** estas 4 variables: `ADMIN_TOKEN`, `LICENSE_PEPPER`,
+`GIST_ID` y `GIST_TOKEN`. La API `PUT /env-vars` reemplaza la lista completa: si
+se usa para agregar una, hay que mandar las 4 juntas o el servidor no arranca.
+
 ## Tareas habituales
 
 ### Crear una clave para un cliente
