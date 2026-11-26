@@ -82,6 +82,28 @@ En el TV Box: Inicio → configurar pantalla de inicio → elegir **Actualizador
 ```
 Para publicar: `git tag -a vX.Y.Z -m "Release"; git push origin vX.Y.Z`
 
+## Próxima mejora: administración de clientes (pendiente)
+
+Hoy la validación es **stateless** (HMAC con `LICENSE_PEPPER`): no guarda qué
+claves se emitieron, así que no se puede listar usuarios ni desactivar una
+clave. Para hacerlo hace falta una base de datos pequeña (recomendación:
+Supabase free / Postgres).
+
+Diseño previsto:
+
+- Tabla `licenses`: hash de la clave (nunca la clave en texto), nombre,
+  vencimiento, `enabled`, fecha de creación y último uso.
+- API: crear clave, listar, renovar días, activar/desactivar y revocar.
+- Panel web `/admin`: lista con días restantes, buscador, botones
+  **Activar/Bloquear**, **Extender** y **Crear clave**.
+- App del TV: entrada de **Modo administrador** protegida con contraseña de
+  admin (nunca guardada en el APK). Consulta el estado y permite activar o
+  bloquear con el control. Para tareas largas se sigue usando el panel web.
+- Migración: cargar la clave actual `PN2B-...` en la base al activar el cambio.
+  El `LICENSE_PEPPER` no se toca para no invalidar claves ya emitidas.
+
+No se incluye en v1.0.8; se implementa en una versión siguiente.
+
 ## Limitación conocida
 
 Android TV no permite instalar APKs en silencio sin root/device owner. La app
