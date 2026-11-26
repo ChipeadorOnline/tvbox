@@ -41,6 +41,9 @@ npm start
 La clave se escribe en mayúsculas y con guiones (`XXXX-XXXX-XXXX-XXXX`). La app
 la formatea sola y el servidor la acepta con o sin guiones.
 
+Clave de prueba vigente hasta el 2026-12-26: `PN2B-9XBY-DJVR-KTSN`
+Link corto del APK para el TV Box: `https://is.gd/PHtE36`
+
 Crear una clave de prueba:
 
 ```bash
