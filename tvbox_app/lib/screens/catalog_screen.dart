@@ -104,7 +104,14 @@ class _CatalogScreenState extends State<CatalogScreen> {
       ),
     );
     if (confirm ?? false) {
-      await widget.installService.uninstall(app.packageName);
+      final opened = await widget.installService.uninstall(app.packageName);
+      if (mounted) {
+        setState(() {
+          _message = opened
+              ? 'En Ajustes, elegí Desinstalar con el control remoto.'
+              : 'No se pudo abrir la pantalla de desinstalación.';
+        });
+      }
       await _reloadInstalled();
     }
   }
@@ -128,7 +135,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.10',
+          version: 'v1.0.11',
         ),
       ),
     );

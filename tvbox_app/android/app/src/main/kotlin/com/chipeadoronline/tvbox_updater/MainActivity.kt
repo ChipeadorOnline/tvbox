@@ -1,5 +1,6 @@
 package com.chipeadoronline.tvbox_updater
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
@@ -80,13 +81,29 @@ class MainActivity : FlutterActivity() {
                     if (target.isNullOrEmpty()) {
                         result.error("NO_PACKAGE", "Falta packageName", null)
                     } else {
-                        val intent = Intent(
+                        // En Android TV el diálogo ACTION_DELETE no siempre se
+                        // abre. Los Ajustes de la app siempre funcionan y desde
+                        // ahí el control remoto puede elegir Desinstalar.
+                        val details = Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:$target"),
+                        )
+                        details.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        val fallback = Intent(
                             Intent.ACTION_DELETE,
                             Uri.parse("package:$target"),
                         )
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                        startActivity(intent)
-                        result.success(true)
+                        fallback.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        try {
+                            if (packageManager.resolveActivity(details, 0) != null) {
+                                startActivity(details)
+                            } else {
+                                startActivity(fallback)
+                            }
+                            result.success(true)
+                        } catch (_: ActivityNotFoundException) {
+                            result.success(false)
+                        }
                     }
                 }
                 else -> result.notImplemented()
