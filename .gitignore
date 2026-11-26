@@ -1,0 +1,11 @@
+server/node_modules/
+server/.env
+server/data/
+apk/
+tvbox_app/build/
+tvbox_app/.dart_tool/
+tvbox_app/.flutter-plugins
+tvbox_app/.flutter-plugins-dependencies
+tvbox_app/android/local.properties
+*.jks
+*.keystore

@@ -1,0 +1,55 @@
+name: Build APK TV Box
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Dependencias
+        working-directory: tvbox_app
+        run: flutter pub get
+
+      - name: Analizar
+        working-directory: tvbox_app
+        run: flutter analyze
+
+      - name: Preparar keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          mkdir -p $HOME/.android
+          echo "$KEYSTORE_BASE64" | base64 -d > $HOME/.android/tvbox-release.jks
+
+      - name: Compilar APK release
+        working-directory: tvbox_app
+        env:
+          KEYSTORE_FILE: ${{ runner.home }}/.android/tvbox-release.jks
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          flutter build apk --release \
+            --dart-define=API_URL=${{ vars.API_URL }} \
+            --dart-define=CATALOG_URL=https://raw.githubusercontent.com/${{ github.repository }}/main/catalog.json
+
+      - name: Publicar APK en el Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          files: tvbox_app/build/app/outputs/flutter-apk/app-release.apk
+          generate_release_notes: true
