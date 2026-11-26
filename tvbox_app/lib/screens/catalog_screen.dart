@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:open_filex/open_filex.dart';
 
 import '../models.dart';
@@ -162,10 +163,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
             onPressed: _refresh,
             icon: const Icon(Icons.refresh),
           ),
-          IconButton(
-            tooltip: 'Cerrar sesión',
+          TextButton.icon(
+            onPressed: () => SystemNavigator.pop(),
+            icon: const Icon(Icons.exit_to_app, size: 20),
+            label: const Text('Salir', style: TextStyle(fontSize: 18)),
+            style: TvStyles.button(const Color(0xFF334155)).copyWith(
+              minimumSize: WidgetStateProperty.all(const Size(150, 44)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          TextButton.icon(
             onPressed: widget.onLogout,
-            icon: const Icon(Icons.logout),
+            icon: const Icon(Icons.logout, size: 20),
+            label: const Text('Cambiar clave', style: TextStyle(fontSize: 18)),
+            style: TvStyles.button(const Color(0xFF334155)).copyWith(
+              minimumSize: WidgetStateProperty.all(const Size(150, 44)),
+            ),
           ),
           const SizedBox(width: 16),
         ],

@@ -15,7 +15,7 @@ La PC **no tiene que estar encendida**: todo está en Render.
 
 - Release publicado: https://github.com/ChipeadorOnline/tvbox/releases/latest
 - Copia local: `apk\tvbox-updater-release.apk`
-- Versión actual: v1.0.5 (sale en la pantalla de clave)
+- Versión actual: v1.0.6 (sale en la pantalla de clave)
 - Incluye: navegación con flechas del control, OK para ingresar, clave con
   mayúsculas y guiones automáticos, opción de launcher y un botón
   **Diagnóstico** que muestra la clave guardada, el estado del servidor y el
@@ -47,7 +47,11 @@ Editar `catalog.json` y subirlo a `main`. Subir `versionCode` cuando cambie un
 APK: la app avisa "Hay novedades". Solo apps con derecho a distribución.
 
 ### Instalar el APK en un TV Box
-Con Downloader: https://is.gd/to4bAi
+Con Downloader: https://is.gd/6JvHMp
+
+### No pedir la clave al reingresar
+La clave queda guardada. En el catálogo, **Salir** cierra la app sin borrar
+la clave; **Cambiar clave** sí la borra (es para reemplazarla).
 
 ### Si la clave dice "inválida o vencida"
 Entrar con la clave, bajar a **Diagnóstico** con las flechas y apretar OK.

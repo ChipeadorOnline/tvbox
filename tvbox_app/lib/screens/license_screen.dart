@@ -29,6 +29,11 @@ class _LicenseScreenState extends State<LicenseScreen> {
   @override
   void initState() {
     super.initState();
+    // Si la clave quedó guardada, la mostramos lista para apretar Ingresar.
+    widget.licenseService.getStoredKey().then((saved) {
+      if (!mounted || saved == null || saved.isEmpty) return;
+      setState(() => _controller.text = _normalizeKey(saved));
+    });
     _focus.requestFocus();
   }
 
@@ -39,7 +44,7 @@ class _LicenseScreenState extends State<LicenseScreen> {
     super.dispose();
   }
 
-  static const String _version = 'v1.0.5';
+  static const String _version = 'v1.0.6';
 
   /// Mayúsculas y guiones: XXXX-XXXX-XXXX-XXXX. Se aplica al escribir y también
   /// al enviar, así funciona aunque el teclado del TV no avise de los cambios.
