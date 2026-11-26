@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-26T23:00:00Z",
+  "updatedAt": "2026-11-26T23:20:00Z",
   "apps": [
     {
       "id": "tvbox-updater",
@@ -7,11 +7,11 @@
       "fileName": "tvbox-updater.apk",
       "packageName": "com.chipeadoronline.tvbox_updater",
       "url": "https://github.com/ChipeadorOnline/tvbox/releases/latest/download/app-release.apk",
-      "version": "1.0.9",
-      "versionCode": 9,
+      "version": "1.0.10",
+      "versionCode": 10,
       "size": 0,
       "sha256": "",
-      "notes": "Actualizador de apps del TV Box. Corrige la reutilización del APK guardado: ahora cada versión se descarga sola."
+      "notes": "Refrescar ofrece instalar la versión nueva desde la app. Corrige la reutilización del APK guardado."
     },
     {
       "id": "smarttube-stable",

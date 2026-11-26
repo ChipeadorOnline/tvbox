@@ -128,7 +128,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.9',
+          version: 'v1.0.10',
         ),
       ),
     );
@@ -137,13 +137,62 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Future<void> _refresh() async {
     try {
       final updated = await widget.catalogService.load();
-      if (mounted) {
-        setState(() => _catalog = updated);
-        await _reloadInstalled();
-      }
+      if (!mounted) return;
+      setState(() => _catalog = updated);
+      await _reloadInstalled();
+      await _offerSelfUpdate(updated);
     } catch (_) {
       if (mounted) setState(() => _message = 'No se pudo actualizar el catálogo');
     }
+  }
+
+  /// Al refrescar, ofrece instalar la versión nueva desde la propia app.
+  Future<void> _offerSelfUpdate(Catalog catalog) async {
+    final own = await widget.installService.ownVersion();
+    CatalogApp? found;
+    for (final app in catalog.apps) {
+      if (app.id == 'tvbox-updater' && app.versionCode > own.versionCode) {
+        found = app;
+        break;
+      }
+    }
+    if (found == null || !mounted) return;
+    final target = found;
+    final update = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF111D28),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Row(
+          children: const [
+            Icon(Icons.system_update, size: 30, color: Color(0xFF38BDF8)),
+            SizedBox(width: 12),
+            Text(
+              'Versión nueva disponible',
+              style: TextStyle(color: Colors.white, fontSize: 22),
+            ),
+          ],
+        ),
+        content: Text(
+          'Hay una versión nueva del Actualizador TV: v${target.version}. '
+          'Se va a descargar y a abrir el instalador de Android.',
+          style: const TextStyle(color: Color(0xFFC6D5E2), fontSize: 17),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext, false),
+            child: const Text('Después'),
+          ),
+          FilledButton(
+            autofocus: true,
+            onPressed: () => Navigator.pop(dialogContext, true),
+            style: TvStyles.button(const Color(0xFF0284C7)),
+            child: const Text('Actualizar ahora'),
+          ),
+        ],
+      ),
+    );
+    if ((update ?? false) && mounted) await _install(target);
   }
 
   Future<void> _install(CatalogApp app) async {
