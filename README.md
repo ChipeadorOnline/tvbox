@@ -99,8 +99,10 @@ copia en `apk/tvbox-updater-release.apk`.
 > `C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt` (fuera del repo).
 > **No subas ese archivo a GitHub.** La huella del certificado es
 > `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
-> El APK actual está compilado con `API_URL=https://TU_DOMINIO.com` de ejemplo;
-> recompilá con tu dominio real antes de distribuirlo.
+> El APK actual está compilado apuntando al túnel Cloudflare
+> `https://abroad-term-avoid-disco.trycloudflare.com`. Las URLs *quick tunnel*
+> cambian cada vez que se reinicia el túnel: cuando tengas dominio propio,
+> recompilá con `.\build-release.ps1 -ApiUrl "https://tu-dominio.com"`.
 
 En GitHub agregá los Secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`,
 `KEY_PASSWORD` y la variable `API_URL`. Al pushear un tag `v1.0.0`, el workflow
@@ -145,3 +147,43 @@ aviso "Hay novedades". Si `sha256` está completo, se verifica la descarga.
 El endpoint `POST /api/webhook/payment` renueva la licencia por X días.
 Conectalo al webhook de MercadoPago/Stripe/PayPal. No usamos Play Billing
 porque la app se instala fuera de Play Store.
+
+## 6. Publicar la API con HTTPS
+
+### Opción A: túnel Cloudflare (sin dominio, para probar ya)
+
+Con la API corriendo en `localhost:3000`:
+
+```powershell
+.\cloudflared-tunnel.ps1
+```
+
+Imprime una URL `https://xxxx.trycloudflare.com` y la guarda en
+`tools\tunnel-url.txt`. Para detenerlo:
+
+```powershell
+.\cloudflared-tunnel.ps1 -Stop
+```
+
+El binario se descarga automáticamente a `tools\cloudflared.exe`.
+
+### Opción B: Docker + nginx + Let's Encrypt (dominio propio)
+
+Necesitás un dominio apuntando a la IP del servidor y Docker instalado.
+
+```bash
+cd deploy
+cp .env.example .env
+# editá API_DOMAIN y ACME_EMAIL
+docker compose up -d --build
+```
+
+El proxy emite el certificado automáticamente y expone la API en
+`https://API_DOMAIN`. Después recompilá la app:
+
+```powershell
+.\build-release.ps1 -ApiUrl "https://API_DOMAIN"
+```
+
+El estado de las licencias se guarda en `server/data/licenses.json`;
+hacé backup de ese archivo y de `server/.env`.

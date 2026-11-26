@@ -9,3 +9,10 @@ tvbox_app/.flutter-plugins-dependencies
 tvbox_app/android/local.properties
 *.jks
 *.keystore
+tools/cloudflared.exe
+tools/tunnel.log
+tools/tunnel.log.err
+tools/tunnel-url.txt
+deploy/.env
+deploy/certs/
+deploy/acme/
