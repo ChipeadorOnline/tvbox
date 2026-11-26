@@ -135,7 +135,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.12',
+          version: 'v1.0.13',
         ),
       ),
     );
@@ -359,7 +359,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         crossAxisCount: 3,
                         crossAxisSpacing: 18,
                         mainAxisSpacing: 18,
-                        childAspectRatio: 2.1,
+                        childAspectRatio: 1.55,
                       ),
                       itemCount: _catalog.apps.length,
                       itemBuilder: (context, index) {
@@ -373,6 +373,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               versionName: '',
                             );
                         return Card(
+                          clipBehavior: Clip.antiAlias,
                           color: info.installed
                               ? const Color(0xFF10281C)
                               : const Color(0xFF111D28),
@@ -386,7 +387,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                             ),
                           ),
                           child: Padding(
-                            padding: const EdgeInsets.all(18),
+                            padding: const EdgeInsets.all(14),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -436,17 +437,25 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           autofocus: index == 0,
                                           onPressed: () => _install(app),
                                           icon: const Icon(Icons.download, size: 19),
-                                          label: Text(
-                                            info.installed
-                                                ? 'Actualizar a v${app.version}'
-                                                : 'Instalar v${app.version}',
-                                            style: const TextStyle(fontSize: 15),
+                                          label: Flexible(
+                                            child: Text(
+                                              info.installed
+                                                  ? 'Actualizar a v${app.version}'
+                                                  : 'Instalar v${app.version}',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: const TextStyle(fontSize: 15),
+                                            ),
                                           ),
                                           style: TvStyles.button(
                                             const Color(0xFF0284C7),
                                           ).copyWith(
-                                            minimumSize: WidgetStateProperty.all(
-                                              const Size(190, 44),
+                                            minimumSize:
+                                                WidgetStateProperty.all(Size.zero),
+                                            padding: WidgetStateProperty.all(
+                                              const EdgeInsets.symmetric(
+                                                horizontal: 12,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -459,15 +468,25 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                               child: TextButton.icon(
                                                 onPressed: () => _open(app),
                                                 icon: const Icon(Icons.launch, size: 18),
-                                                label: const Text(
-                                                  'Abrir',
-                                                  style: TextStyle(fontSize: 15),
+                                                label: const Flexible(
+                                                  child: Text(
+                                                    'Abrir',
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(fontSize: 15),
+                                                  ),
                                                 ),
                                                 style: TvStyles.button(
                                                   const Color(0xFF166534),
                                                 ).copyWith(
-                                                  minimumSize: WidgetStateProperty.all(
-                                                    const Size(90, 38),
+                                                  minimumSize:
+                                                      WidgetStateProperty.all(
+                                                    Size.zero,
+                                                  ),
+                                                  padding: WidgetStateProperty.all(
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                    ),
                                                   ),
                                                 ),
                                               ),
@@ -477,15 +496,25 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                               child: TextButton.icon(
                                                 onPressed: () => _uninstall(app),
                                                 icon: const Icon(Icons.delete, size: 18),
-                                                label: const Text(
-                                                  'Borrar',
-                                                  style: TextStyle(fontSize: 15),
+                                                label: const Flexible(
+                                                  child: Text(
+                                                    'Borrar',
+                                                    maxLines: 1,
+                                                    overflow: TextOverflow.ellipsis,
+                                                    style: TextStyle(fontSize: 15),
+                                                  ),
                                                 ),
                                                 style: TvStyles.button(
                                                   const Color(0xFF7F1D1D),
                                                 ).copyWith(
-                                                  minimumSize: WidgetStateProperty.all(
-                                                    const Size(90, 38),
+                                                  minimumSize:
+                                                      WidgetStateProperty.all(
+                                                    Size.zero,
+                                                  ),
+                                                  padding: WidgetStateProperty.all(
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 8,
+                                                    ),
                                                   ),
                                                 ),
                                               ),

@@ -15,7 +15,7 @@ La PC **no tiene que estar encendida**: todo está en Render.
 
 - Release publicado: https://github.com/ChipeadorOnline/tvbox/releases/latest
 - Copia local: `apk\tvbox-updater-release.apk`
-- Versión actual: v1.0.12 (sale en la pantalla de clave)
+- Versión actual: v1.0.13 (sale en la pantalla de clave)
 - Incluye: navegación con flechas del control, OK para ingresar, clave con
   mayúsculas y guiones automáticos, opción de launcher y un botón
   **Diagnóstico** que muestra la clave guardada, el estado del servidor y el
@@ -71,8 +71,20 @@ en el APK. Para respaldar el registro, usar **Exportar JSON**.
 Editar `catalog.json` y subirlo a `main`. Subir `versionCode` cuando cambie un
 APK: la app avisa "Hay novedades". Solo apps con derecho a distribución.
 
+El catálogo incluye 19 apps: Actualizador TV, SmartTube oficial y 17 APKs del
+release `v1` de este repo (Magma, Xuper, Send Files To TV, Downloader, etc.).
+Cada entrada tiene `packageName`, `version`, `versionCode`, tamaño y `sha256`
+reales, leídos con `aapt2`. Se dejaron afuera `FCTV33_p`, `Net.Flix.M+`,
+X-plore de `androforever.com` y el SmartTube viejo (`v29.83`): las dos primeras
+son Mod/Premium renombradas, X-plore viene de un sitio de cracks y SmartTube
+se reemplaza por el release oficial `v32.80`.
+
+Para actualizar una app: subir el APK nuevo al release, cambiar `version` y
+`versionCode` en `catalog.json` y subir `main`. El cliente aprieta **Actualizar**
+o ve el aviso de novedades.
+
 ### Instalar el APK en un TV Box
-Con Downloader: https://is.gd/o3bOgN
+Con Downloader: https://is.gd/xRtr59
 
 ### Clientes: clave individual y renovación
 Cada amigo tiene su **propia clave** generada en el panel con su nombre y
