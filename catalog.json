@@ -1,4 +1,27 @@
 {
-  "updatedAt": "2026-11-26",
-  "apps": []
+  "updatedAt": "2026-11-26T21:40:00Z",
+  "apps": [
+    {
+      "id": "tvbox-updater",
+      "name": "Actualizador TV",
+      "fileName": "tvbox-updater.apk",
+      "url": "https://github.com/ChipeadorOnline/tvbox/releases/latest/download/app-release.apk",
+      "version": "1.0.5",
+      "versionCode": 1,
+      "size": 0,
+      "sha256": "",
+      "notes": "Actualizador de apps del TV Box. Trae navegación con control remoto y panel de diagnóstico."
+    },
+    {
+      "id": "smarttube-stable",
+      "name": "SmartTube",
+      "fileName": "smarttube-stable.apk",
+      "url": "https://github.com/yuliskov/SmartTube/releases/download/latest/smarttube_stable.apk",
+      "version": "32.80",
+      "versionCode": 2470,
+      "size": 0,
+      "sha256": "",
+      "notes": "Cliente de YouTube para Android TV. Descarga oficial del proyecto SmartTube."
+    }
+  ]
 }
