@@ -39,11 +39,11 @@ jobs:
       - name: Compilar APK release
         working-directory: tvbox_app
         env:
-          KEYSTORE_FILE: ${{ runner.home }}/.android/tvbox-release.jks
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: |
+          export KEYSTORE_FILE="$HOME/.android/tvbox-release.jks"
           flutter build apk --release \
             --dart-define=API_URL=${{ vars.API_URL }} \
             --dart-define=CATALOG_URL=https://raw.githubusercontent.com/${{ github.repository }}/main/catalog.json
