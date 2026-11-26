@@ -78,7 +78,13 @@ KEY_ALIAS=tvbox
 KEY_PASSWORD=...
 ```
 
-Y compilar:
+Y compilar con el script incluido (firma release incluida):
+
+```powershell
+.\build-release.ps1 -ApiUrl "https://tu-dominio.com"
+```
+
+O directamente:
 
 ```bash
 flutter build apk --release \
@@ -86,7 +92,15 @@ flutter build apk --release \
   --dart-define=CATALOG_URL=https://raw.githubusercontent.com/ChipeadorOnline/tvbox/main/catalog.json
 ```
 
-El APK queda en `tvbox_app/build/app/outputs/flutter-apk/app-release.apk`.
+El APK queda en `tvbox_app/build/app/outputs/flutter-apk/app-release.apk` y una
+copia en `apk/tvbox-updater-release.apk`.
+
+> En esta PC el keystore está en `keystore/tvbox-release.jks` y las claves en
+> `C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt` (fuera del repo).
+> **No subas ese archivo a GitHub.** La huella del certificado es
+> `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
+> El APK actual está compilado con `API_URL=https://TU_DOMINIO.com` de ejemplo;
+> recompilá con tu dominio real antes de distribuirlo.
 
 En GitHub agregá los Secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`,
 `KEY_PASSWORD` y la variable `API_URL`. Al pushear un tag `v1.0.0`, el workflow
