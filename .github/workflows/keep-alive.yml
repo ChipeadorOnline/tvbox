@@ -1,0 +1,16 @@
+name: Mantener API activa
+
+# Render gratuito se duerme después de ~15 min sin uso. Este ping cada 10 min
+# mantiene la API despierta para que la app valide la clave al instante.
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping de salud
+        run: curl --fail --silent --show-error "${{ vars.API_URL }}/api/health"

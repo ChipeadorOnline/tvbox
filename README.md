@@ -103,16 +103,17 @@ copia en `apk/tvbox-updater-release.apk`.
 > **No subas ese archivo a GitHub.** La huella del certificado es
 > `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
 > APK publicado por GitHub Actions:
-> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.2/app-release.apk
+> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.3/app-release.apk
 >
-> Está compilado apuntando al túnel Cloudflare
-> `https://abroad-term-avoid-disco.trycloudflare.com`. Las URLs *quick tunnel*
-> cambian cada vez que se reinicia el túnel: cuando tengas dominio propio,
-> actualizá la variable `API_URL` en GitHub y pusheá un tag nuevo.
+> Está compilado apuntando a la API fija de Render
+> `https://tvbox-license.onrender.com`, así que **no depende de que esta PC esté
+> encendida**. Para cambiarla, actualizá la variable `API_URL` en GitHub y
+> pusheá un tag nuevo.
 
 En GitHub agregá los Secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS`,
-`KEY_PASSWORD` y la variable `API_URL`. Al pushear un tag `v1.0.0`, el workflow
-compila y sube el APK al Release.
+`KEY_PASSWORD` y la variable `API_URL`. Al pushear un tag `v*`, el workflow
+compila y sube el APK al Release. El workflow `keep-alive.yml` hace un ping cada
+10 minutos para que el plan gratuito de Render no se duerma.
 
 Para generar el base64 del keystore en PowerShell:
 
@@ -148,15 +149,31 @@ aviso "Hay novedades". Si `sha256` está completo, se verifica la descarga.
    la primera vez; la app abre esa pantalla cuando hace falta.
 3. Ingresá la clave del abono.
 
-## Pagos
+## Pagos / renovación
 
-El endpoint `POST /api/webhook/payment` renueva la licencia por X días.
-Conectalo al webhook de MercadoPago/Stripe/PayPal. No usamos Play Billing
-porque la app se instala fuera de Play Store.
+La API es *stateless*: la clave lleva la fecha de vencimiento y una firma HMAC.
+Para renovar, generá una clave nueva con `POST /api/admin/licenses` y entregala
+al usuario (no hay base de datos que migrate ni disco que se pierda).
+
+```bash
+curl -X POST https://tvbox-license.onrender.com/api/admin/licenses ^
+  -H "Authorization: Bearer TU_ADMIN_TOKEN" ^
+  -H "Content-Type: application/json" ^
+  -d "{\"username\":\"juan\",\"days\":30}"
+```
+
+Guardá `LICENSE_PEPPER` en un lugar seguro: si lo cambiás, **todas** las claves
+emitidas dejan de funcionar. Los valores de producción están en
+`C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt`.
 
 ## 6. Publicar la API con HTTPS
 
-### Opción A: túnel Cloudflare (sin dominio, para probar ya)
+### Producción: Render (activo)
+
+Servicio: `https://tvbox-license.onrender.com` (plan gratuito, deploy automático
+desde `main`). Variables de entorno: `ADMIN_TOKEN` y `LICENSE_PEPPER`.
+
+### Opción A: túnel Cloudflare (solo para pruebas locales)
 
 Con la API corriendo en `localhost:3000`:
 
