@@ -44,7 +44,7 @@ class _LicenseScreenState extends State<LicenseScreen> {
     super.dispose();
   }
 
-  static const String _version = 'v1.0.6';
+  static const String _version = 'v1.0.7';
 
   /// Mayúsculas y guiones: XXXX-XXXX-XXXX-XXXX. Se aplica al escribir y también
   /// al enviar, así funciona aunque el teclado del TV no avise de los cambios.

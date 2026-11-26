@@ -40,6 +40,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
   late LicenseState _license;
   final Set<String> _busy = <String>{};
   final Map<String, double> _progress = <String, double>{};
+  final Map<String, InstalledInfo> _installed = <String, InstalledInfo>{};
   String? _message;
 
   @override
@@ -47,6 +48,58 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.initState();
     _catalog = widget.catalog;
     _license = widget.license;
+    _reloadInstalled();
+  }
+
+  Future<void> _reloadInstalled() async {
+    final entries = await Future.wait(
+      _catalog.apps.map(
+        (app) => widget.installService.installedInfo(app.packageName),
+      ),
+    );
+    if (!mounted) return;
+    setState(() {
+      _installed.clear();
+      for (var i = 0; i < _catalog.apps.length; i++) {
+        _installed[_catalog.apps[i].id] = entries[i];
+      }
+    });
+  }
+
+  Future<void> _open(CatalogApp app) async {
+    final ok = await widget.installService.openApp(app.packageName);
+    if (!ok && mounted) {
+      setState(() => _message = 'No se pudo abrir ${app.name}');
+    }
+  }
+
+  Future<void> _uninstall(CatalogApp app) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF111D28),
+        title: Text('Desinstalar ${app.name}?', style: const TextStyle(color: Colors.white)),
+        content: const Text(
+          'Se abrirá el diálogo de Android para confirmar.',
+          style: TextStyle(color: Color(0xFFC6D5E2)),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TvStyles.button(const Color(0xFFB91C1C)),
+            child: const Text('Desinstalar'),
+          ),
+        ],
+      ),
+    );
+    if (confirm ?? false) {
+      await widget.installService.uninstall(app.packageName);
+      await _reloadInstalled();
+    }
   }
 
   @override
@@ -54,6 +107,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.catalog != widget.catalog) {
       setState(() => _catalog = widget.catalog);
+      _reloadInstalled();
     }
     if (oldWidget.license != widget.license) {
       setState(() => _license = widget.license);
@@ -63,7 +117,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Future<void> _refresh() async {
     try {
       final updated = await widget.catalogService.load();
-      if (mounted) setState(() => _catalog = updated);
+      if (mounted) {
+        setState(() => _catalog = updated);
+        await _reloadInstalled();
+      }
     } catch (_) {
       if (mounted) setState(() => _message = 'No se pudo actualizar el catálogo');
     }
@@ -135,6 +192,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           _busy.remove(app.id);
           _progress.remove(app.id);
         });
+        _reloadInstalled();
       }
     }
   }
@@ -223,6 +281,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         final app = _catalog.apps[index];
                         final busy = _busy.contains(app.id);
                         final progress = _progress[app.id] ?? 0;
+                        final info = _installed[app.id] ??
+                            const InstalledInfo(
+                              installed: false,
+                              versionCode: 0,
+                              versionName: '',
+                            );
                         return Card(
                           color: const Color(0xFF111D28),
                           shape: RoundedRectangleBorder(
@@ -255,23 +319,88 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     fontSize: 15,
                                   ),
                                 ),
+                                if (info.installed) ...[
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    'Instalada ${info.label}',
+                                    style: const TextStyle(
+                                      color: Color(0xFF86EFAC),
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
                                 const Spacer(),
                                 if (busy)
                                   LinearProgressIndicator(value: progress > 0 ? progress : null)
                                 else
-                                  SizedBox(
-                                    width: double.infinity,
-                                    height: 46,
-                                    child: FilledButton.icon(
-                                      autofocus: index == 0,
-                                      onPressed: () => _install(app),
-                                      icon: const Icon(Icons.download),
-                                      label: const Text(
-                                        'Descargar e instalar',
-                                        style: TextStyle(fontSize: 17),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                                    children: [
+                                      SizedBox(
+                                        width: double.infinity,
+                                        height: 44,
+                                        child: FilledButton.icon(
+                                          autofocus: index == 0,
+                                          onPressed: () => _install(app),
+                                          icon: const Icon(Icons.download, size: 19),
+                                          label: Text(
+                                            info.installed
+                                                ? 'Actualizar'
+                                                : 'Descargar e instalar',
+                                            style: const TextStyle(fontSize: 16),
+                                          ),
+                                          style: TvStyles.button(
+                                            const Color(0xFF0284C7),
+                                          ).copyWith(
+                                            minimumSize: WidgetStateProperty.all(
+                                              const Size(160, 44),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                      style: TvStyles.button(const Color(0xFF0284C7)),
-                                    ),
+                                      if (info.installed) ...[
+                                        const SizedBox(height: 6),
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: TextButton.icon(
+                                                onPressed: () => _open(app),
+                                                icon: const Icon(Icons.launch, size: 18),
+                                                label: const Text(
+                                                  'Abrir',
+                                                  style: TextStyle(fontSize: 15),
+                                                ),
+                                                style: TvStyles.button(
+                                                  const Color(0xFF166534),
+                                                ).copyWith(
+                                                  minimumSize: WidgetStateProperty.all(
+                                                    const Size(90, 38),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: TextButton.icon(
+                                                onPressed: () => _uninstall(app),
+                                                icon: const Icon(Icons.delete, size: 18),
+                                                label: const Text(
+                                                  'Borrar',
+                                                  style: TextStyle(fontSize: 15),
+                                                ),
+                                                style: TvStyles.button(
+                                                  const Color(0xFF7F1D1D),
+                                                ).copyWith(
+                                                  minimumSize: WidgetStateProperty.all(
+                                                    const Size(90, 38),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ],
                                   ),
                               ],
                             ),

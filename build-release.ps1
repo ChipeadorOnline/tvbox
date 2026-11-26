@@ -1,7 +1,9 @@
 param(
   [Parameter(Mandatory = $true)]
   [string]$ApiUrl,
-  [string]$CatalogUrl = 'https://raw.githubusercontent.com/ChipeadorOnline/tvbox/main/catalog.json'
+  [string]$CatalogUrl = 'https://raw.githubusercontent.com/ChipeadorOnline/tvbox/main/catalog.json',
+  [string]$BuildName = '1.0.7',
+  [int]$BuildNumber = 7
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,6 +12,8 @@ $root = $PSScriptRoot
 Push-Location (Join-Path $root 'tvbox_app')
 try {
   flutter build apk --release `
+    --build-name=$BuildName `
+    --build-number=$BuildNumber `
     --dart-define="API_URL=$ApiUrl" `
     --dart-define="CATALOG_URL=$CatalogUrl"
 } finally {

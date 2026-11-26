@@ -4,6 +4,7 @@ class CatalogApp {
   final String id;
   final String name;
   final String fileName;
+  final String packageName;
   final String url;
   final String? version;
   final int versionCode;
@@ -17,11 +18,12 @@ class CatalogApp {
     required this.fileName,
     required this.url,
     required this.versionCode,
+    String? packageName,
     this.version,
     this.size = 0,
     this.sha256,
     this.notes,
-  });
+  }) : packageName = packageName ?? id;
 
   factory CatalogApp.fromJson(Map<String, dynamic> json) {
     final url = (json['url'] as String?)?.trim() ?? '';
@@ -38,6 +40,7 @@ class CatalogApp {
       name: (json['name'] as String?)?.trim() ?? id,
       fileName: fileName,
       url: url,
+      packageName: (json['packageName'] as String?)?.trim(),
       version: json['version'] as String?,
       versionCode: _toInt(json['versionCode']) ?? 0,
       size: _toInt(json['size']) ?? 0,
@@ -51,6 +54,7 @@ class CatalogApp {
         'name': name,
         'fileName': fileName,
         'url': url,
+        'packageName': packageName,
         'version': version,
         'versionCode': versionCode,
         'size': size,

@@ -109,7 +109,10 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
         _license = license;
         _stage = _Stage.ready;
       });
-      if (showNotice && hasNews) {
+      final selfUpdate = await _hasSelfUpdate(catalog);
+      if (showNotice && selfUpdate) {
+        await _showSelfUpdateNotice();
+      } else if (showNotice && hasNews) {
         await _showUpdateNotice(catalog);
       }
     } catch (e) {
@@ -120,6 +123,49 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
         });
       }
     }
+  }
+
+  Future<bool> _hasSelfUpdate(Catalog catalog) async {
+    final own = await widget.installService.ownVersion();
+    for (final app in catalog.apps) {
+      if (app.id == 'tvbox-updater' && app.versionCode > own.versionCode) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> _showSelfUpdateNotice() async {
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        backgroundColor: const Color(0xFF111D28),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Row(
+          children: const [
+            Icon(Icons.system_update, size: 32, color: Color(0xFF38BDF8)),
+            SizedBox(width: 12),
+            Text('Actualización disponible',
+                style: TextStyle(color: Colors.white, fontSize: 24)),
+          ],
+        ),
+        content: const Text(
+          'Hay una versión nueva del Actualizador TV. '
+          'Andá a la tarjeta "Actualizador TV" y apretá Actualizar.',
+          style: TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+        ),
+        actions: [
+          FilledButton(
+            autofocus: true,
+            onPressed: () => Navigator.pop(dialogContext),
+            style: TvStyles.button(const Color(0xFF0284C7)),
+            child: const Text('Entendido', style: TextStyle(fontSize: 19)),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _showUpdateNotice(Catalog catalog) async {
