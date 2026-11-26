@@ -10,6 +10,7 @@ import 'services/catalog_service.dart';
 import 'services/download_service.dart';
 import 'services/install_service.dart';
 import 'services/license_service.dart';
+import 'tv_navigation.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -208,27 +209,30 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
           onSuccess: () => _start(),
         );
       case _Stage.error:
-        return Scaffold(
-          body: Center(
-            child: Padding(
-              padding: const EdgeInsets.all(32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.wifi_off, size: 64, color: Color(0xFFF59E0B)),
-                  const SizedBox(height: 16),
-                  Text(
-                    'No se pudo cargar: $_error',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
-                  ),
-                  const SizedBox(height: 24),
-                  FilledButton(
-                    autofocus: true,
-                    onPressed: () => _start(),
-                    child: const Text('Reintentar'),
-                  ),
-                ],
+        return TvNavigation(
+          child: Scaffold(
+            body: Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.wifi_off, size: 64, color: Color(0xFFF59E0B)),
+                    const SizedBox(height: 16),
+                    Text(
+                      'No se pudo cargar: $_error',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+                    ),
+                    const SizedBox(height: 24),
+                    FilledButton(
+                      autofocus: true,
+                      onPressed: () => _start(),
+                      style: TvStyles.button(const Color(0xFF0284C7)),
+                      child: const Text('Reintentar'),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

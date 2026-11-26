@@ -4,6 +4,8 @@ require('dotenv').config();
 
 const express = require('express');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
 
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
@@ -112,6 +114,21 @@ app.use((req, res, next) => {
 
 app.get('/api/health', (_req, res) => {
   res.json({ ok: true, now: new Date().toISOString() });
+});
+
+// Panel para generar claves de clientes sin exponer el token administrativo.
+app.get('/admin', (_req, res) => {
+  res.type('html').send(
+    fs.readFileSync(path.join(__dirname, 'admin.html'), 'utf8'),
+  );
+});
+
+app.post('/api/admin/ui-create', (req, res) => {
+  const body = req.body || {};
+  if (!safeEqual(String(body.password || ''), ADMIN_TOKEN)) {
+    return res.status(401).json({ error: 'Contraseña incorrecta' });
+  }
+  res.status(201).json(createKey(body.username, body.days || 30));
 });
 
 app.post('/api/license/validate', (req, res) => {

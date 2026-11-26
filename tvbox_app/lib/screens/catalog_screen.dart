@@ -8,6 +8,7 @@ import '../services/catalog_service.dart';
 import '../services/download_service.dart';
 import '../services/install_service.dart';
 import '../services/license_service.dart';
+import '../tv_navigation.dart';
 
 class CatalogScreen extends StatefulWidget {
   const CatalogScreen({
@@ -139,7 +140,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return TvNavigation(
+      child: Scaffold(
       backgroundColor: const Color(0xFF070E14),
       appBar: AppBar(
         backgroundColor: const Color(0xFF0D1720),
@@ -255,12 +257,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         'Descargar e instalar',
                                         style: TextStyle(fontSize: 17),
                                       ),
-                                      style: FilledButton.styleFrom(
-                                        backgroundColor: const Color(0xFF0284C7),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(10),
-                                        ),
-                                      ),
+                                      style: TvStyles.button(const Color(0xFF0284C7)),
                                     ),
                                   ),
                               ],
@@ -273,6 +270,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 }

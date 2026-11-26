@@ -106,7 +106,7 @@ copia en `apk/tvbox-updater-release.apk`.
 > **No subas ese archivo a GitHub.** La huella del certificado es
 > `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
 > APK publicado por GitHub Actions:
-> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.3/app-release.apk
+> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.4/app-release.apk
 >
 > Está compilado apuntando a la API fija de Render
 > `https://tvbox-license.onrender.com`, así que **no depende de que esta PC esté
@@ -151,6 +151,33 @@ aviso "Hay novedades". Si `sha256` está completo, se verifica la descarga.
 2. Instalalo y activá en **Ajustes → Seguridad → Instalar apps desconocidas**
    la primera vez; la app abre esa pantalla cuando hace falta.
 3. Ingresá la clave del abono.
+4. Para usarlo como **launcher**: en el box, poné *Inicio → configurar pantalla de inicio*
+   y elegí **Actualizador TV**. Desde entonces, al encender o apretar Home se abre
+   directamente la app con el catálogo de los clientes.
+
+## Administrar clientes
+
+Panel web: **https://tvbox-license.onrender.com/admin**
+
+Ahí cargás la contraseña de administrador (el `ADMIN_TOKEN` de Render), el nombre
+del cliente y los días de abono. El panel genera una clave `XXXX-XXXX-XXXX-XXXX`
+y la podés copiar para mandarla al cliente por WhatsApp/email. La clave vence
+sola en la fecha indicada y la app deja de entrar automáticamente.
+
+También se puede generar por API:
+
+```bash
+curl -X POST https://tvbox-license.onrender.com/api/admin/licenses \
+  -H "Authorization: Bearer TU_ADMIN_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"cliente","days":30}'
+```
+
+## Entregar apps a los clientes
+
+Cargá cada APK en `catalog.json` con su URL HTTPS y su `versionCode`. Cuando
+subás el `versionCode`, la app muestra aviso de novedades y el cliente descarga
+e instala desde ahí. Solo incluí apps que tengas derecho a distribuir.
 
 ## Pagos / renovación
 

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin de abonos - TV Box</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; padding: 32px 16px;
+    background: #070e14; color: #dbe9f4;
+    font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  .card {
+    max-width: 560px; margin: 0 auto; padding: 28px;
+    background: #111d28; border: 1px solid #24384a; border-radius: 18px;
+  }
+  h1 { margin: 0 0 4px; font-size: 24px; color: #fff; }
+  p.sub { margin: 0 0 24px; color: #9fb6c9; font-size: 15px; }
+  label { display: block; margin: 14px 0 6px; color: #bfe3fa; font-size: 14px; }
+  input {
+    width: 100%; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid #2b4356; background: #0a141d; color: #fff; font-size: 16px;
+  }
+  input:focus { outline: 2px solid #38bdf8; outline-offset: 1px; }
+  button {
+    margin-top: 22px; width: 100%; padding: 14px; border: 0; border-radius: 10px;
+    background: #0284c7; color: #fff; font-size: 17px; font-weight: 600; cursor: pointer;
+  }
+  button:disabled { opacity: .5; cursor: default; }
+  .result {
+    margin-top: 22px; padding: 18px; border-radius: 12px;
+    background: #0a2010; border: 1px solid #1c5c33; display: none;
+  }
+  .result.show { display: block; }
+  .key {
+    display: block; margin: 8px 0 12px; font: 700 26px/1.2 ui-monospace, monospace;
+    letter-spacing: 2px; color: #86efac; word-break: break-all;
+  }
+  .meta { color: #a7d8bc; font-size: 14px; }
+  .error { margin-top: 16px; color: #fca5a5; }
+  a { color: #38bdf8; }
+  .foot { margin-top: 26px; font-size: 13px; color: #5b7386; text-align: center; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Ab TV Box</h1>
+  <p class="sub">Generar clave de abono para un cliente.</p>
+
+  <form id="form">
+    <label for="password">Contraseña de administrador</label>
+    <input id="password" type="password" autocomplete="current-password" required>
+
+    <label for="username">Cliente</label>
+    <input id="username" type="text" placeholder="Nombre del cliente" autocomplete="off">
+
+    <label for="days">Días de abono</label>
+    <input id="days" type="number" min="1" max="3650" value="30" required>
+
+    <button id="submit" type="submit">Generar clave</button>
+  </form>
+
+  <div class="error" id="error"></div>
+
+  <div class="result" id="result">
+    <div class="meta">Clave del cliente:</div>
+    <span class="key" id="key"></span>
+    <div class="meta" id="meta"></div>
+    <button type="button" id="copy">Copiar clave</button>
+  </div>
+
+  <div class="foot">
+    <a href="https://github.com/ChipeadorOnline/tvbox/releases/latest">Descargar APK</a>
+  </div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+$('form').addEventListener('submit', async (event) => {
+  event.preventDefault();
+  $('error').textContent = '';
+  $('result').classList.remove('show');
+  $('submit').disabled = true;
+  try {
+    const response = await fetch('/api/admin/ui-create', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        password: $('password').value,
+        username: $('username').value,
+        days: Number($('days').value),
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'No se pudo generar la clave');
+    $('key').textContent = data.key;
+    $('meta').textContent = 'Vence: ' + new Date(data.expiresAt).toLocaleDateString('es-AR');
+    $('result').classList.add('show');
+  } catch (error) {
+    $('error').textContent = error.message;
+  } finally {
+    $('submit').disabled = false;
+  }
+});
+$('copy').addEventListener('click', async () => {
+  await navigator.clipboard.writeText($('key').textContent);
+  $('copy').textContent = 'Copiada';
+  setTimeout(() => ($('copy').textContent = 'Copiar clave'), 1500);
+});
+</script>
+</body>
+</html>
