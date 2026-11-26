@@ -44,9 +44,12 @@ function writeDb(db) {
 }
 
 function hashKey(key) {
+  const normalized = String(key)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
   return crypto
     .createHash('sha256')
-    .update(`${PEPPER}|${String(key).trim().toUpperCase()}`)
+    .update(`${PEPPER}|${normalized}`)
     .digest('hex');
 }
 

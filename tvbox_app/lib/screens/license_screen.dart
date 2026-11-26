@@ -36,6 +36,21 @@ class _LicenseScreenState extends State<LicenseScreen> {
     super.dispose();
   }
 
+  /// Escribe en mayúsculas y coloca los guiones automáticamente: XXXX-XXXX-XXXX-XXXX.
+  void _formatKey(String text) {
+    final cleaned = text.toUpperCase().replaceAll(RegExp(r'[^A-Z0-9]'), '');
+    final limited = cleaned.substring(0, cleaned.length > 16 ? 16 : cleaned.length);
+    final formatted = limited.replaceAllMapped(
+      RegExp(r'.{1,4}'),
+      (match) => '${match.group(0)}-',
+    ).replaceAll(RegExp(r'-$'), '');
+    if (formatted == _controller.text) return;
+    _controller.value = _controller.value.copyWith(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+
   Future<void> _submit() async {
     final key = _controller.text.trim();
     if (key.isEmpty) {
@@ -104,6 +119,7 @@ class _LicenseScreenState extends State<LicenseScreen> {
                       focusNode: _focus,
                       autofocus: true,
                       textInputAction: TextInputAction.done,
+                      onChanged: _formatKey,
                       onSubmitted: (_) => _submit(),
                       style: const TextStyle(fontSize: 22, color: Colors.white),
                       decoration: InputDecoration(

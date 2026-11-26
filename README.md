@@ -38,6 +38,9 @@ cp .env.example .env
 npm start
 ```
 
+La clave se escribe en mayúsculas y con guiones (`XXXX-XXXX-XXXX-XXXX`). La app
+la formatea sola y el servidor la acepta con o sin guiones.
+
 Crear una clave de prueba:
 
 ```bash
