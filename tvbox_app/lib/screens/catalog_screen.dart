@@ -128,7 +128,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.8',
+          version: 'v1.0.9',
         ),
       ),
     );
@@ -347,11 +347,12 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 const SizedBox(height: 6),
                                 Text(
                                   [
-                                    if (app.version != null) 'v${app.version}',
+                                    if (app.version != null)
+                                      'Versión disponible: v${app.version}',
                                     app.sizeLabel,
                                   ].where((s) => s.isNotEmpty).join('  ·  '),
                                   style: const TextStyle(
-                                    color: Color(0xFF839BB0),
+                                    color: Color(0xFFBFE3FA),
                                     fontSize: 15,
                                   ),
                                 ),
@@ -381,15 +382,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                           icon: const Icon(Icons.download, size: 19),
                                           label: Text(
                                             info.installed
-                                                ? 'Actualizar'
-                                                : 'Descargar e instalar',
-                                            style: const TextStyle(fontSize: 16),
+                                                ? 'Actualizar a v${app.version}'
+                                                : 'Instalar v${app.version}',
+                                            style: const TextStyle(fontSize: 15),
                                           ),
                                           style: TvStyles.button(
                                             const Color(0xFF0284C7),
                                           ).copyWith(
                                             minimumSize: WidgetStateProperty.all(
-                                              const Size(160, 44),
+                                              const Size(190, 44),
                                             ),
                                           ),
                                         ),

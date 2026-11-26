@@ -11,21 +11,38 @@ class DownloadService {
 
   final http.Client _client;
 
+  Future<Directory> _downloadsDir() async {
+    final base = await getApplicationDocumentsDirectory();
+    final dir = Directory('${base.path}${Platform.pathSeparator}downloads');
+    await dir.create(recursive: true);
+    return dir;
+  }
+
+  /// El nombre incluye el versionCode: así una versión nueva nunca reutiliza
+  /// el APK guardado por una versión anterior.
+  String _fileName(CatalogApp app) =>
+      '${app.id}_${app.versionCode}_${app.fileName}'
+          .replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+
+  Future<File> _target(CatalogApp app) async {
+    final dir = await _downloadsDir();
+    return File('${dir.path}${Platform.pathSeparator}${_fileName(app)}');
+  }
+
   /// Descarga el APK a una carpeta privada de la app (sirve FileProvider).
   Future<File> download(
     CatalogApp app, {
     void Function(int received, int total)? onProgress,
   }) async {
-    final base = await getApplicationDocumentsDirectory();
-    final dir = Directory('${base.path}${Platform.pathSeparator}downloads');
-    await dir.create(recursive: true);
-    final safeName = app.fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
-    final target = File('${dir.path}${Platform.pathSeparator}$safeName');
+    final target = await _target(app);
 
     if (await target.exists()) {
       final length = await target.length();
       if (app.size <= 0 || length == app.size) {
-        if (await _matchesDigest(target, app.sha256)) return target;
+        if (await _matchesDigest(target, app.sha256)) {
+          await _removeLegacy(app);
+          return target;
+        }
       }
     }
 
@@ -55,7 +72,16 @@ class DownloadService {
     if (!await _matchesDigest(target, app.sha256)) {
       throw Exception('El APK no coincide con el SHA-256 publicado');
     }
+    await _removeLegacy(app);
     return target;
+  }
+
+  /// Borra el archivo sin versión que usaban las builds anteriores.
+  Future<void> _removeLegacy(CatalogApp app) async {
+    final dir = await _downloadsDir();
+    final legacyName = app.fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
+    final legacy = File('${dir.path}${Platform.pathSeparator}$legacyName');
+    if (await legacy.exists()) await legacy.delete();
   }
 
   Future<bool> _matchesDigest(File file, String? expected) async {
@@ -66,11 +92,8 @@ class DownloadService {
   }
 
   Future<void> remove(CatalogApp app) async {
-    final base = await getApplicationDocumentsDirectory();
-    final safeName = app.fileName.replaceAll(RegExp(r'[^A-Za-z0-9._-]'), '_');
-    final file = File(
-      '${base.path}${Platform.pathSeparator}downloads${Platform.pathSeparator}$safeName',
-    );
-    if (await file.exists()) await file.delete();
+    final target = await _target(app);
+    if (await target.exists()) await target.delete();
+    await _removeLegacy(app);
   }
 }

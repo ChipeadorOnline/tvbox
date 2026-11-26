@@ -15,12 +15,17 @@ La PC **no tiene que estar encendida**: todo está en Render.
 
 - Release publicado: https://github.com/ChipeadorOnline/tvbox/releases/latest
 - Copia local: `apk\tvbox-updater-release.apk`
-- Versión actual: v1.0.8 (sale en la pantalla de clave)
+- Versión actual: v1.0.9 (sale en la pantalla de clave)
 - Incluye: navegación con flechas del control, OK para ingresar, clave con
   mayúsculas y guiones automáticos, opción de launcher y un botón
   **Diagnóstico** que muestra la clave guardada, el estado del servidor y el
   código HTTP exacto de la validación.
 - Espera de hasta 70 s para que Render despierte, con reintento automático.
+- v1.0.9 corrige un fallo crítico: el APK descargado se guardaba siempre con el
+  mismo nombre y se reutilizaba aunque el catálogo tuviera otra versión. Ahora
+  el archivo incluye el `versionCode`, el botón dice `Instalar vX` y la tarjeta
+  muestra `Versión disponible: vX`. Ante la duda, instalar siempre con el link
+  corto para salir del bucle de caché.
 
 ## Clave de prueba
 
@@ -47,7 +52,7 @@ Editar `catalog.json` y subirlo a `main`. Subir `versionCode` cuando cambie un
 APK: la app avisa "Hay novedades". Solo apps con derecho a distribución.
 
 ### Instalar el APK en un TV Box
-Con Downloader: https://is.gd/kKzbYW
+Con Downloader: https://is.gd/LwXmUp
 
 ### Clientes: clave individual y renovación
 Cada amigo tiene su **propia clave** generada en el panel con su nombre y
