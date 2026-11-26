@@ -113,8 +113,8 @@ class LicenseService {
       response = await _post('/api/license/validate', {'key': key});
     } catch (_) {
       // Si ya entramos con esta misma clave, la tolerancia sin internet aplica.
-      if (await canEnterOffline(key)) {
-        final cached = LicenseState.fromJson(jsonDecode(cachedRaw!));
+      if (await canEnterOffline(key) && cachedRaw != null) {
+        final cached = LicenseState.fromJson(jsonDecode(cachedRaw));
         return cached.copyWith(fromCache: true);
       }
       throw const LicenseException(

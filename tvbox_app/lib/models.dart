@@ -160,8 +160,9 @@ class LicenseState {
       );
 
   String get expiryLabel {
-    if (expiresAt == null) return 'Sin vencimiento';
-    final days = expiresAt!.difference(DateTime.now()).inDays;
+    final expires = expiresAt;
+    if (expires == null) return 'Sin vencimiento';
+    final days = expires.difference(DateTime.now()).inDays;
     if (days < 0) return 'Vencida';
     if (days == 0) return 'Vence hoy';
     return 'Vence en $days día${days == 1 ? '' : 's'}';

@@ -15,7 +15,7 @@ La PC **no tiene que estar encendida**: todo está en Render.
 
 - Release publicado: https://github.com/ChipeadorOnline/tvbox/releases/latest
 - Copia local: `apk\tvbox-updater-release.apk`
-- Versión actual: v1.0.11 (sale en la pantalla de clave)
+- Versión actual: v1.0.12 (sale en la pantalla de clave)
 - Incluye: navegación con flechas del control, OK para ingresar, clave con
   mayúsculas y guiones automáticos, opción de launcher y un botón
   **Diagnóstico** que muestra la clave guardada, el estado del servidor y el
@@ -28,6 +28,11 @@ La PC **no tiene que estar encendida**: todo está en Render.
 - v1.0.10 agrega que **Refrescar** ofrece directamente la versión nueva con un
   botón **Actualizar ahora**, que descarga y abre el instalador sin salir de la
   app.
+- v1.0.11 hace que **Borrar** abra los Ajustes de la app (más confiable en TV)
+  en vez del diálogo directo de desinstalación.
+- v1.0.12 evita el error `Null check operator used on a null value`: si falta
+  caché de licencia, vencimiento o estado del catálogo, muestra un mensaje y un
+  botón **Reintentar** en lugar de fallar.
 - Si el TV quedó en v1.0.6 o anterior, hay que instalar **una sola vez** con el
   link corto para salir del bucle de caché. Después ya se actualiza desde la app.
 
@@ -56,7 +61,7 @@ Editar `catalog.json` y subirlo a `main`. Subir `versionCode` cuando cambie un
 APK: la app avisa "Hay novedades". Solo apps con derecho a distribución.
 
 ### Instalar el APK en un TV Box
-Con Downloader: https://is.gd/AvvtiL
+Con Downloader: https://is.gd/o3bOgN
 
 ### Clientes: clave individual y renovación
 Cada amigo tiene su **propia clave** generada en el panel con su nombre y

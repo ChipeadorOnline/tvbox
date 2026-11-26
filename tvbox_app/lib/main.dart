@@ -284,10 +284,42 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
           ),
         );
       case _Stage.ready:
+        final catalog = _catalog;
+        final license = _license;
+        if (catalog == null || license == null) {
+          return TvNavigation(
+            child: Scaffold(
+              body: Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.refresh, size: 64, color: Color(0xFFF59E0B)),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Faltaron datos para abrir el catálogo. Probá de nuevo.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+                      ),
+                      const SizedBox(height: 24),
+                      FilledButton(
+                        autofocus: true,
+                        onPressed: () => _start(),
+                        style: TvStyles.button(const Color(0xFF0284C7)),
+                        child: const Text('Reintentar'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
         return CatalogScreen(
-          key: ValueKey('${_catalog!.signature}-${_license!.checkedAt}'),
-          catalog: _catalog!,
-          license: _license!,
+          key: ValueKey('${catalog.signature}-${license.checkedAt}'),
+          catalog: catalog,
+          license: license,
           catalogService: widget.catalogService,
           licenseService: widget.licenseService,
           downloadService: widget.downloadService,
