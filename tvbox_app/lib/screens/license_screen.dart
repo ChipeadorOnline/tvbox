@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../models.dart';
 import '../services/license_service.dart';
 import '../tv_navigation.dart';
+import 'diagnostic_screen.dart';
 
 class LicenseScreen extends StatefulWidget {
   const LicenseScreen({
@@ -38,7 +39,7 @@ class _LicenseScreenState extends State<LicenseScreen> {
     super.dispose();
   }
 
-  static const String _version = 'v1.0.4';
+  static const String _version = 'v1.0.5';
 
   /// Mayúsculas y guiones: XXXX-XXXX-XXXX-XXXX. Se aplica al escribir y también
   /// al enviar, así funciona aunque el teclado del TV no avise de los cambios.
@@ -85,8 +86,8 @@ class _LicenseScreenState extends State<LicenseScreen> {
       widget.onSuccess();
     } on LicenseException catch (e) {
       setState(() => _error = e.message);
-    } catch (_) {
-      setState(() => _error = 'No se pudo verificar la clave');
+    } catch (e) {
+      setState(() => _error = 'No se pudo verificar la clave: $e');
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -95,7 +96,6 @@ class _LicenseScreenState extends State<LicenseScreen> {
   @override
   Widget build(BuildContext context) {
     return TvNavigation(
-      onConfirm: _busy ? null : _submit,
       child: Scaffold(
         body: Center(
           child: SingleChildScrollView(
@@ -181,7 +181,35 @@ class _LicenseScreenState extends State<LicenseScreen> {
                               : const Text('Ingresar', style: TextStyle(fontSize: 22)),
                         ),
                       ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 52,
+                        child: FilledButton(
+                          onPressed: _busy
+                              ? null
+                              : () => Navigator.of(context).push(
+                                    MaterialPageRoute<void>(
+                                      builder: (_) => DiagnosticScreen(
+                                        licenseService: widget.licenseService,
+                                        version: _version,
+                                      ),
+                                    ),
+                                  ),
+                          style: TvStyles.button(const Color(0xFF334155)),
+                          child: const Text(
+                            'Diagnóstico',
+                            style: TextStyle(fontSize: 19),
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 20),
+                      Text(
+                        'Si el servidor está despertando, la espera puede '
+                        'tardar hasta 1 minuto.',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(color: Color(0xFF5B7386), fontSize: 14),
+                      ),
+                      const SizedBox(height: 8),
                       Text(
                         _version,
                         textAlign: TextAlign.center,
