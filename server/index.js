@@ -10,6 +10,8 @@ const path = require('path');
 const PORT = Number(process.env.PORT || 3000);
 const ADMIN_TOKEN = process.env.ADMIN_TOKEN;
 const SECRET = process.env.LICENSE_PEPPER || 'CAMBIAR_PEPPER';
+const GIST_ID = process.env.GIST_ID;
+const GIST_TOKEN = process.env.GIST_TOKEN;
 
 if (!ADMIN_TOKEN) {
   console.error('ERROR: configurá ADMIN_TOKEN antes de iniciar el servidor.');
@@ -103,7 +105,7 @@ function requireAdmin(req, res, next) {
 
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json({ limit: '16kb' }));
+app.use(express.json({ limit: '64kb' }));
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -129,6 +131,70 @@ app.post('/api/admin/ui-create', (req, res) => {
     return res.status(401).json({ error: 'Contraseña incorrecta' });
   }
   res.status(201).json(createKey(body.username, body.days || 30));
+});
+
+function gistHeaders() {
+  return {
+    Authorization: `Bearer ${GIST_TOKEN}`,
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'tvbox-admin',
+  };
+}
+
+async function readClientsGist() {
+  if (!GIST_ID || !GIST_TOKEN) throw new Error('Registro en GitHub no configurado');
+  const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+    headers: gistHeaders(),
+  });
+  if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
+  const gist = await response.json();
+  const raw = (gist.files && gist.files['clientes.json'] && gist.files['clientes.json'].content) || '[]';
+  const parsed = JSON.parse(raw);
+  return Array.isArray(parsed) ? parsed : [];
+}
+
+async function writeClientsGist(clients) {
+  if (!GIST_ID || !GIST_TOKEN) throw new Error('Registro en GitHub no configurado');
+  const response = await fetch(`https://api.github.com/gists/${GIST_ID}`, {
+    method: 'PATCH',
+    headers: { ...gistHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      files: {
+        'clientes.json': {
+          content: JSON.stringify(clients, null, 2) + '\n',
+        },
+      },
+    }),
+  });
+  if (!response.ok) throw new Error(`GitHub respondió ${response.status}`);
+}
+
+app.post('/api/admin/clients/read', async (req, res) => {
+  const body = req.body || {};
+  if (!safeEqual(String(body.password || ''), ADMIN_TOKEN)) {
+    return res.status(401).json({ error: 'Contraseña incorrecta' });
+  }
+  try {
+    res.json({ clients: await readClientsGist() });
+  } catch (error) {
+    res.status(502).json({ error: error.message });
+  }
+});
+
+app.post('/api/admin/clients/write', async (req, res) => {
+  const body = req.body || {};
+  if (!safeEqual(String(body.password || ''), ADMIN_TOKEN)) {
+    return res.status(401).json({ error: 'Contraseña incorrecta' });
+  }
+  if (!Array.isArray(body.clients)) {
+    return res.status(400).json({ error: 'Falta el registro de clientes' });
+  }
+  try {
+    await writeClientsGist(body.clients);
+    res.json({ ok: true });
+  } catch (error) {
+    res.status(502).json({ error: error.message });
+  }
 });
 
 app.post('/api/license/validate', (req, res) => {

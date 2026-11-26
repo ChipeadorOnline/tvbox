@@ -100,13 +100,17 @@
   <div class="card">
     <h1>Registro local de clientes</h1>
     <p class="sub">
-      Se guarda automáticamente en este navegador. Editá nombre, estado o nota
-      y apretá <b>Guardar</b>. Para cambiar la clave o los días, generá una nueva.
+      Al ingresar la contraseña se carga desde GitHub, y cada cambio se guarda
+      solo ahí. También podés exportar una copia JSON. Para cambiar la clave o
+      los días, generá una nueva.
     </p>
     <div class="row">
+      <button type="button" class="secondary" id="push">Guardar en GitHub</button>
+      <button type="button" class="secondary" id="pull">Cargar de GitHub</button>
       <button type="button" class="secondary" id="export">Exportar JSON</button>
       <button type="button" class="danger" id="clear">Vaciar registro</button>
     </div>
+    <div class="meta" id="status" style="margin-top:12px"></div>
     <div class="table-wrap">
       <table id="table">
         <thead>
@@ -153,10 +157,12 @@ function loadClients() {
 }
 
 let clients = loadClients();
+let pulled = false;
 
-function saveClients() {
+function saveClients(sync = true) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(clients));
   render();
+  if (sync && $('password').value) pushToGithub(true);
 }
 
 function render() {
@@ -206,12 +212,60 @@ function render() {
   });
 }
 
+async function githubRequest(path, extra) {
+  const password = $('password').value;
+  if (!password) throw new Error('Ingresá la contraseña de administrador arriba');
+  const response = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ password, ...extra }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.error || 'No se pudo sincronizar');
+  return data;
+}
+
+async function pushToGithub(silent) {
+  $('status').textContent = 'Guardando en GitHub...';
+  try {
+    await githubRequest('/api/admin/clients/write', { clients });
+    $('status').textContent = 'Registro guardado en GitHub (gist privado).';
+  } catch (error) {
+    $('status').textContent = error.message;
+    if (!silent) $('error').textContent = error.message;
+  }
+}
+
+async function pullFromGithub() {
+  $('status').textContent = 'Cargando desde GitHub...';
+  try {
+    const data = await githubRequest('/api/admin/clients/read', {});
+    clients = Array.isArray(data.clients) ? data.clients : [];
+    pulled = true;
+    saveClients(false);
+    $('status').textContent = 'Registro cargado desde GitHub.';
+    return true;
+  } catch (error) {
+    $('status').textContent = error.message;
+    $('error').textContent = error.message;
+    return false;
+  }
+}
+
+$('password').addEventListener('change', () => {
+  if (!pulled && $('password').value) pullFromGithub();
+});
+
+$('push').addEventListener('click', () => pushToGithub(false));
+$('pull').addEventListener('click', () => pullFromGithub());
+
 $('form').addEventListener('submit', async (event) => {
   event.preventDefault();
   $('error').textContent = '';
   $('result').classList.remove('show');
   $('submit').disabled = true;
   try {
+    if (!pulled && $('password').value && !(await pullFromGithub())) return;
     const username = $('username').value.trim();
     const days = Number($('days').value);
     const response = await fetch('/api/admin/ui-create', {

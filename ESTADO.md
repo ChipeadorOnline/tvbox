@@ -55,6 +55,13 @@ de Render. Si se pierde el `LICENSE_PEPPER`, las claves emitidas dejan de funcio
 ### Crear una clave para un cliente
 Entrar a https://tvbox-license.onrender.com/admin, cargar la contraseña de
 administrador (está en el archivo de secretos), el nombre del cliente y los días.
+Al poner la contraseña el panel carga el registro desde un **gist privado** de
+GitHub; cada clave generada o editada se guarda ahí sola. El registro también
+queda en el navegador y se puede exportar con **Exportar JSON**.
+
+El gist es privado (ID `c3836d1a33e0aad1304e4090292b55ab`) y el token con permiso
+`gist` está guardado como variable `GIST_TOKEN` en Render, nunca en el repo ni
+en el APK. Para respaldar el registro, usar **Exportar JSON**.
 
 ### Agregar o actualizar apps
 Editar `catalog.json` y subirlo a `main`. Subir `versionCode` cuando cambie un
@@ -97,11 +104,13 @@ En el TV Box: Inicio → configurar pantalla de inicio → elegir **Actualizador
 ```
 Para publicar: `git tag -a vX.Y.Z -m "Release"; git push origin vX.Y.Z`
 
-## Próxima mejora: administración de clientes (pendiente)
+## Próxima mejora: bloquear y renovar desde el panel (pendiente)
 
-Hoy la validación es **stateless** (HMAC con `LICENSE_PEPPER`): no guarda qué
-claves se emitieron, así que no se puede listar usuarios ni desactivar una
-clave. Para hacerlo hace falta una base de datos pequeña (recomendación:
+Hoy la validación es **stateless** (HMAC con `LICENSE_PEPPER`) y el panel ya
+mantiene el registro de clientes en un gist privado. Ese registro permite ver,
+editar y borrar nombres/claves, pero el estado «Bloqueada» es solo informativo:
+**no desactiva la clave en el servidor**. Para que bloquear y extender días
+tengan efecto real hace falta una base de datos pequeña (recomendación:
 Supabase free / Postgres).
 
 Diseño previsto:
@@ -117,7 +126,8 @@ Diseño previsto:
 - Migración: cargar la clave actual `PN2B-...` en la base al activar el cambio.
   El `LICENSE_PEPPER` no se toca para no invalidar claves ya emitidas.
 
-No se incluye en v1.0.8; se implementa en una versión siguiente.
+El registro en gist privado ya está incluido; la base de datos queda para una
+versión siguiente.
 
 ## Limitación conocida
 

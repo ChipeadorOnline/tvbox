@@ -164,6 +164,14 @@ del cliente y los días de abono. El panel genera una clave `XXXX-XXXX-XXXX-XXXX
 y la podés copiar para mandarla al cliente por WhatsApp/email. La clave vence
 sola en la fecha indicada y la app deja de entrar automáticamente.
 
+El panel mantiene un registro de clientes (nombre, clave, días, vencimiento,
+estado y nota). Al escribir la contraseña carga el registro desde un **gist
+privado** de GitHub; cada cambio se guarda ahí automáticamente. También podés
+editar, borrar y exportar el registro a JSON. El token del gist vive solo en las
+variables de Render (`GIST_TOKEN`), nunca en el repo ni en el APK. El estado
+«Bloqueada» es solo informativo: para desactivar claves de verdad hará falta
+una base de datos.
+
 También se puede generar por API:
 
 ```bash
