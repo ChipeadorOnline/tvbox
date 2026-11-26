@@ -103,7 +103,7 @@ copia en `apk/tvbox-updater-release.apk`.
 > **No subas ese archivo a GitHub.** La huella del certificado es
 > `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
 > APK publicado por GitHub Actions:
-> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.1/app-release.apk
+> https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.2/app-release.apk
 >
 > Está compilado apuntando al túnel Cloudflare
 > `https://abroad-term-avoid-disco.trycloudflare.com`. Las URLs *quick tunnel*
