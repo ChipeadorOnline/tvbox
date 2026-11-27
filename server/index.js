@@ -60,9 +60,19 @@ function sign(payload) {
   return crypto.createHmac('sha256', SECRET).update(payload).digest();
 }
 
-function createKey(username, days) {
+function durationSeconds(body) {
+  const minutes = Number(body.minutes);
+  if (Number.isFinite(minutes) && minutes > 0) {
+    return Math.min(Math.ceil(minutes), 1440) * 60;
+  }
+  const days = Number(body.days);
+  const safeDays = Number.isFinite(days) && days > 0 ? days : 30;
+  return Math.min(safeDays, 3650) * 86400;
+}
+
+function createKey(username, body = {}) {
   const expiresSeconds =
-    Math.floor(Date.now() / 1000) + Math.min(Number(days) || 30, 3650) * 86400;
+    Math.floor(Date.now() / 1000) + durationSeconds(body);
   const userId = crypto.randomBytes(2).readUInt16BE(0);
   const bytes = Buffer.alloc(10);
   bytes.writeUInt32BE(expiresSeconds, 0);
@@ -130,7 +140,7 @@ app.post('/api/admin/ui-create', (req, res) => {
   if (!safeEqual(String(body.password || ''), ADMIN_TOKEN)) {
     return res.status(401).json({ error: 'Contraseña incorrecta' });
   }
-  res.status(201).json(createKey(body.username, body.days || 30));
+  res.status(201).json(createKey(body.username, body));
 });
 
 function gistHeaders() {
@@ -212,7 +222,7 @@ app.post('/api/license/validate', (req, res) => {
 // Emite una clave nueva. Para renovar, generá otra con más días.
 app.post('/api/admin/licenses', requireAdmin, (req, res) => {
   const body = req.body || {};
-  const license = createKey(body.username, body.days || 30);
+  const license = createKey(body.username, body);
   res.status(201).json(license);
 });
 

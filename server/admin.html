@@ -80,6 +80,9 @@
       <label for="days">Días de abono</label>
       <input id="days" type="number" min="1" max="3650" value="30" required>
 
+      <label for="minutes">Minutos de prueba (opcional)</label>
+      <input id="minutes" type="number" min="1" max="1440" placeholder="Ej: 5 o 10; vacío = usar días">
+
       <button id="submit" type="submit">Generar clave</button>
     </form>
 
@@ -175,7 +178,7 @@ function render() {
     tr.innerHTML = `
       <td><input data-index="${index}" data-field="client" value="${esc(client.client)}"></td>
       <td><code>${esc(client.key)}</code></td>
-      <td>${esc(client.days)}</td>
+      <td>${client.minutes ? esc(client.minutes) + ' min' : esc(client.days)}</td>
       <td>${fmt(client.expiresAt)}</td>
       <td>
         <select data-index="${index}" data-field="status">
@@ -268,6 +271,7 @@ $('form').addEventListener('submit', async (event) => {
     if (!pulled && $('password').value && !(await pullFromGithub())) return;
     const username = $('username').value.trim();
     const days = Number($('days').value);
+    const minutes = Number($('minutes').value);
     const response = await fetch('/api/admin/ui-create', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -275,6 +279,7 @@ $('form').addEventListener('submit', async (event) => {
         password: $('password').value,
         username,
         days,
+        ...(minutes > 0 ? { minutes } : {}),
       }),
     });
     const data = await response.json();
@@ -284,10 +289,11 @@ $('form').addEventListener('submit', async (event) => {
       id: (crypto.randomUUID && crypto.randomUUID()) || String(Date.now()),
       client: username || 'Sin nombre',
       key: data.key,
-      days,
+      days: minutes > 0 ? 0 : days,
+      ...(minutes > 0 ? { minutes } : {}),
       expiresAt: data.expiresAt,
       status: 'Activa',
-      note: '',
+      note: minutes > 0 ? 'Prueba corta' : '',
     });
     saveClients();
 

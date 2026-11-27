@@ -18,9 +18,9 @@ de Android. Eso es una limitación del sistema, no de la app.
 
 ## 2. Estado actual
 
-- Versión vigente: **v1.0.16** (`versionCode 16`, aparece en la pantalla de clave y en Diagnóstico).
-- Link corto para instalar en la TV: **https://is.gd/n79w08**
-- Release: https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.16/app-release.apk
+- Versión vigente: **v1.0.17** (`versionCode 17`, aparece en la pantalla de clave y en Diagnóstico).
+- Link corto para instalar en la TV: **https://is.gd/LtHKCx**
+- Release: https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.17/app-release.apk
 - API de licencias: https://tvbox-license.onrender.com (`/api/health` debe responder `ok`).
 - Panel de administración: https://tvbox-license.onrender.com/admin
 - Catálogo público: 19 apps.
@@ -61,12 +61,27 @@ clave del cliente y no hay que subirla a GitHub.**
    - `2` = prueba de 2 días.
    - `30` = abono mensual.
    - Se acepta de 1 a 3650 días.
-4. **Generar clave**.
-5. **Copiar clave** y mandársela al cliente.
+4. **Minutos de prueba (opcional)**: si ponés `5` o `10`, ese valor manda y la
+   clave vence en minutos. Dejar vacío para usar Días.
+5. **Generar clave**.
+6. **Copiar clave** y mandársela al cliente.
 
-No hay un botón separado de "prueba": basta con poner `2` en Días. La TV va a
-mostrar **"Vence en 2 días"**. Al vencimiento, la clave deja de servir aunque el
-TV no tenga internet.
+No hay un botón separado de "prueba": basta con poner `2` en Días, o `5`/`10`
+en Minutos para una prueba corta. La TV va a mostrar **"Vence hoy"** o
+**"Vence en 2 días"**. Al vencimiento, la clave deja de servir aunque el TV no
+tenga internet.
+
+### Probar un bloqueo por vencimiento en 5 o 10 minutos
+
+1. En el panel generá una clave con **Minutos = 5** (o 10) y un nombre de prueba.
+2. En la TV apretá **Cambiar clave** y poné esa clave.
+3. Esperá a que pasen los minutos.
+4. Cerrá y volvé a abrir la app (o apretá **Reintentar**). Debe aparecer la
+   pantalla de clave con el error **"Clave inválida o vencida (código 403)"**.
+5. Para volver a la normalidad, apretá **Cambiar clave** y poné la clave real.
+
+Esto no afecta a los clientes: las claves ya emitidas siguen igual y
+`LICENSE_PEPPER` no se toca.
 
 ### Registro local de clientes
 
@@ -207,7 +222,8 @@ Los secretos del keystore y de Render están en
 - Si falla la validación online, se usa la última licencia guardada, siempre que
   no esté vencida y la clave sea la misma.
 - El vencimiento manda: aunque haya tolerancia offline de 7 días, una clave de
-  2 días deja de servir a los 2 días.
+  2 días deja de servir a los 2 días, y una de 5 minutos a los 5 minutos.
+  Desde v1.0.17 la caché de 24 h también revisa el vencimiento (antes no).
 - En la app hay botón **Diagnóstico**: muestra versión, API, hora del equipo,
   clave guardada, resultado de `/api/health` y de la validación. Es lo primero
   que hay que mirar si algo falla.
@@ -215,7 +231,7 @@ Los secretos del keystore y de Render están en
 ## 9. Instalación en la TV
 
 1. Instalar Downloader en la TV.
-2. Abrir Downloader y cargar el link corto: **https://is.gd/n79w08**
+2. Abrir Downloader y cargar el link corto: **https://is.gd/LtHKCx**
 3. Dar permiso de instalación de apps desconocidas a Downloader/Actualizador.
 4. Instalar y abrir.
 5. Poner la clave.

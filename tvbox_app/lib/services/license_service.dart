@@ -103,7 +103,11 @@ class LicenseService {
     if (!forceOnline && cachedRaw != null) {
       final cached = LicenseState.fromJson(jsonDecode(cachedRaw));
       final age = DateTime.now().difference(cached.checkedAt);
-      if (cached.active && age.inHours < AppConfig.licenseCheckHours) {
+      final notExpired = cached.expiresAt == null ||
+          cached.expiresAt!.isAfter(DateTime.now());
+      if (cached.active &&
+          notExpired &&
+          age.inHours < AppConfig.licenseCheckHours) {
         return cached.copyWith(fromCache: true);
       }
     }
