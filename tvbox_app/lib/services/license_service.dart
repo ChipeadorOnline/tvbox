@@ -73,8 +73,8 @@ class LicenseService {
     final uri = Uri.parse('${AppConfig.apiUrl}$path');
     Object? lastError;
     // Render en plan gratuito se duerme: el primer request puede tardar
-    // hasta 50 s en despertar. Probamos dos veces con tiempos crecientes.
-    for (final seconds in [20, 50]) {
+    // bastante en despertar. Probamos tres veces con tiempos crecientes.
+    for (final seconds in [20, 45, 60]) {
       try {
         return await _client
             .post(

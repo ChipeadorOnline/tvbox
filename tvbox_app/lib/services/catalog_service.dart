@@ -24,13 +24,24 @@ class CatalogService {
 
   /// Trae el catálogo desde GitHub. Si falla la red, usa la última copia.
   Future<Catalog> load() async {
+    Object? lastError;
+    http.Response? response;
+    for (final seconds in [20, 45]) {
+      try {
+        response = await _client
+            .get(
+              Uri.parse(AppConfig.catalogUrl),
+              headers: const {'Cache-Control': 'no-cache'},
+            )
+            .timeout(Duration(seconds: seconds));
+        break;
+      } catch (e) {
+        lastError = e;
+        await Future<void>.delayed(const Duration(seconds: 2));
+      }
+    }
     try {
-      final response = await _client
-          .get(
-            Uri.parse(AppConfig.catalogUrl),
-            headers: const {'Cache-Control': 'no-cache'},
-          )
-          .timeout(const Duration(seconds: 20));
+      if (response == null) throw lastError ?? 'Sin respuesta del catálogo';
       if (response.statusCode != 200) {
         throw Exception('HTTP ${response.statusCode}');
       }
