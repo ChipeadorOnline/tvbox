@@ -83,6 +83,10 @@ tenga internet.
 Esto no afecta a los clientes: las claves ya emitidas siguen igual y
 `LICENSE_PEPPER` no se toca.
 
+Prueba realizada el 27/11/2026 con una clave de 10 minutos: al vencimiento el
+servidor devolvió **403**. La app bloquea al cerrar/abrir o al apretar
+**Reintentar**; no expulsa en el mismo segundo del vencimiento.
+
 ### Registro local de clientes
 
 Botones:

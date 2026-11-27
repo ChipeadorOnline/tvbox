@@ -46,6 +46,8 @@ La PC **no tiene que estar encendida**: todo está en Render.
   **Instalada vX** y solo muestra **Actualizar** cuando hay una versión nueva.
 - v1.0.17 respeta el vencimiento aunque la caché tenga menos de 24 h. El panel
   permite generar claves de prueba de 5 o 10 minutos con el campo **Minutos**.
+  Prueba verificada el 27/11/2026: una clave de 10 minutos devolvió **403**
+  apenas venció en el servidor.
 - Si el TV quedó en v1.0.6 o anterior, hay que instalar **una sola vez** con el
   link corto para salir del bucle de caché. Después ya se actualiza desde la app.
 
