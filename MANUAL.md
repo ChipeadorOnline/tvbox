@@ -87,6 +87,10 @@ Prueba realizada el 27/11/2026 con una clave de 10 minutos: al vencimiento el
 servidor devolvió **403**. La app bloquea al cerrar/abrir o al apretar
 **Reintentar**; no expulsa en el mismo segundo del vencimiento.
 
+**Refrescar no revalida la clave**: solo baja el catálogo. Si la clave venció
+mientras la app estaba abierta, apretar Refrescar no muestra el error; hay que
+cerrar y abrir, o usar **Diagnóstico → Reintentar**.
+
 ### Registro local de clientes
 
 Botones:
