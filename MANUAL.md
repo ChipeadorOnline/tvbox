@@ -18,9 +18,9 @@ de Android. Eso es una limitación del sistema, no de la app.
 
 ## 2. Estado actual
 
-- Versión vigente: **v1.0.17** (`versionCode 17`, aparece en la pantalla de clave y en Diagnóstico).
-- Link corto para instalar en la TV: **https://is.gd/LtHKCx**
-- Release: https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.17/app-release.apk
+- Versión vigente: **v1.0.18** (`versionCode 18`, aparece en la pantalla de clave y en Diagnóstico).
+- Link corto para instalar en la TV: **https://is.gd/wl2tE7**
+- Release: https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.18/app-release.apk
 - API de licencias: https://tvbox-license.onrender.com (`/api/health` debe responder `ok`).
 - Panel de administración: https://tvbox-license.onrender.com/admin
 - Catálogo público: 19 apps.
@@ -232,6 +232,9 @@ Los secretos del keystore y de Render están en
 - El vencimiento manda: aunque haya tolerancia offline de 7 días, una clave de
   2 días deja de servir a los 2 días, y una de 5 minutos a los 5 minutos.
   Desde v1.0.17 la caché de 24 h también revisa el vencimiento (antes no).
+- Desde v1.0.18, al volver del instalador de Android la app recarga sin mostrar
+  diálogos, para evitar el error **"Null check operator used on a null value"**
+  en algunos TV Box.
 - En la app hay botón **Diagnóstico**: muestra versión, API, hora del equipo,
   clave guardada, resultado de `/api/health` y de la validación. Es lo primero
   que hay que mirar si algo falla.
@@ -239,7 +242,7 @@ Los secretos del keystore y de Render están en
 ## 9. Instalación en la TV
 
 1. Instalar Downloader en la TV.
-2. Abrir Downloader y cargar el link corto: **https://is.gd/LtHKCx**
+2. Abrir Downloader y cargar el link corto: **https://is.gd/wl2tE7**
 3. Dar permiso de instalación de apps desconocidas a Downloader/Actualizador.
 4. Instalar y abrir.
 5. Poner la clave.

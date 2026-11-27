@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-27T05:00:00Z",
+  "updatedAt": "2026-11-27T13:45:00Z",
   "apps": [
     {
       "id": "tvbox-updater",
@@ -7,11 +7,11 @@
       "fileName": "tvbox-updater.apk",
       "packageName": "com.chipeadoronline.tvbox_updater",
       "url": "https://github.com/ChipeadorOnline/tvbox/releases/latest/download/app-release.apk",
-      "version": "1.0.17",
-      "versionCode": 17,
+      "version": "1.0.18",
+      "versionCode": 18,
       "size": 0,
       "sha256": "",
-      "notes": "El vencimiento de la clave se respeta aunque la cache tenga menos de 24 horas."
+      "notes": "Corrige el error al volver del instalador de Android durante una actualización."
     },
     {
       "id": "smarttube-stable",

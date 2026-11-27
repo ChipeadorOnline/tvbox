@@ -22,6 +22,7 @@ class CatalogScreen extends StatefulWidget {
     required this.downloadService,
     required this.installService,
     required this.onLogout,
+    this.onInstalling,
   });
 
   final Catalog catalog;
@@ -31,6 +32,10 @@ class CatalogScreen extends StatefulWidget {
   final DownloadService downloadService;
   final InstallService installService;
   final VoidCallback onLogout;
+
+  /// Avisa a la pantalla principal cuando se abre el instalador de Android.
+  /// así no vuelve a mostrar diálogos al volver de esa actividad.
+  final ValueChanged<bool>? onInstalling;
 
   @override
   State<CatalogScreen> createState() => _CatalogScreenState();
@@ -85,7 +90,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: const Color(0xFF111D28),
-        title: Text('Desinstalar ${app.name}?', style: const TextStyle(color: Colors.white)),
+        title: Text(
+          'Desinstalar ${app.name}?',
+          style: const TextStyle(color: Colors.white),
+        ),
         content: const Text(
           'Se abrirá el diálogo de Android para confirmar.',
           style: TextStyle(color: Color(0xFFC6D5E2)),
@@ -135,7 +143,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.17',
+          version: 'v1.0.18',
         ),
       ),
     );
@@ -149,7 +157,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
       await _reloadInstalled();
       await _offerSelfUpdate(updated);
     } catch (_) {
-      if (mounted) setState(() => _message = 'No se pudo actualizar el catálogo');
+      if (mounted) {
+        setState(() => _message = 'No se pudo actualizar el catálogo');
+      }
     }
   }
 
@@ -216,7 +226,10 @@ class _CatalogScreenState extends State<CatalogScreen> {
           context: context,
           builder: (_) => AlertDialog(
             backgroundColor: const Color(0xFF111D28),
-            title: const Text('Permiso de instalación', style: TextStyle(color: Colors.white)),
+            title: const Text(
+              'Permiso de instalación',
+              style: TextStyle(color: Colors.white),
+            ),
             content: const Text(
               'Android TV necesita permiso para instalar APKs. Abrí los ajustes, activá tu app y volvé.',
               style: TextStyle(color: Color(0xFFC6D5E2)),
@@ -244,7 +257,9 @@ class _CatalogScreenState extends State<CatalogScreen> {
         onProgress: (received, total) {
           if (!mounted) return;
           setState(() {
-            _progress[app.id] = total > 0 ? (received / total).clamp(0.0, 1.0) : 0;
+            _progress[app.id] = total > 0
+                ? (received / total).clamp(0.0, 1.0)
+                : 0;
           });
         },
       );
@@ -256,11 +271,22 @@ class _CatalogScreenState extends State<CatalogScreen> {
       if (mounted) {
         setState(() => _message = 'Abriendo el instalador de Android...');
       }
+      // Avisamos antes de salir a la actividad del sistema. Al volver, la
+      // pantalla principal recarga sin mostrar avisos (evita el error de
+      // Navigator al abrir un diálogo durante el cambio de actividad).
+      widget.onInstalling?.call(true);
       final result = await widget.installService.openApk(file);
-      if (result.type != ResultType.done && mounted) {
-        setState(() => _message = 'No se pudo abrir el instalador: ${result.message}');
+      if (result.type != ResultType.done) {
+        widget.onInstalling?.call(false);
+        if (mounted) {
+          setState(
+            () =>
+                _message = 'No se pudo abrir el instalador: ${result.message}',
+          );
+        }
       }
     } catch (e) {
+      widget.onInstalling?.call(false);
       if (mounted) setState(() => _message = 'Error: $e');
     } finally {
       if (mounted) {
@@ -268,7 +294,6 @@ class _CatalogScreenState extends State<CatalogScreen> {
           _busy.remove(app.id);
           _progress.remove(app.id);
         });
-        _reloadInstalled();
       }
     }
   }
@@ -277,277 +302,314 @@ class _CatalogScreenState extends State<CatalogScreen> {
   Widget build(BuildContext context) {
     return TvNavigation(
       child: Scaffold(
-      backgroundColor: const Color(0xFF070E14),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0D1720),
-        title: const Text(
-          'Actualizador TV Box',
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        ),
-        actions: [
-          Chip(
-            avatar: const Icon(Icons.schedule, size: 18),
-            label: Text(_license.expiryLabel),
-            backgroundColor: const Color(0xFF15293A),
-            labelStyle: const TextStyle(color: Color(0xFFBFE3FA)),
+        backgroundColor: const Color(0xFF070E14),
+        appBar: AppBar(
+          backgroundColor: const Color(0xFF0D1720),
+          title: const Text(
+            'Actualizador TV Box',
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(width: 12),
-          IconButton(
-            tooltip: 'Actualizar lista',
-            onPressed: _refresh,
-            icon: const Icon(Icons.refresh),
-          ),
-          TextButton.icon(
-            onPressed: _openDiagnostic,
-            icon: const Icon(Icons.info_outline, size: 20),
-            label: const Text('Diagnóstico', style: TextStyle(fontSize: 18)),
-            style: TvStyles.button(const Color(0xFF334155)).copyWith(
-              minimumSize: WidgetStateProperty.all(const Size(140, 44)),
+          actions: [
+            Chip(
+              avatar: const Icon(Icons.schedule, size: 18),
+              label: Text(_license.expiryLabel),
+              backgroundColor: const Color(0xFF15293A),
+              labelStyle: const TextStyle(color: Color(0xFFBFE3FA)),
             ),
-          ),
-          const SizedBox(width: 12),
-          TextButton.icon(
-            onPressed: () => SystemNavigator.pop(),
-            icon: const Icon(Icons.exit_to_app, size: 20),
-            label: const Text('Salir', style: TextStyle(fontSize: 18)),
-            style: TvStyles.button(const Color(0xFF334155)).copyWith(
-              minimumSize: WidgetStateProperty.all(const Size(150, 44)),
+            const SizedBox(width: 12),
+            IconButton(
+              tooltip: 'Actualizar lista',
+              onPressed: _refresh,
+              icon: const Icon(Icons.refresh),
             ),
-          ),
-          const SizedBox(width: 12),
-          TextButton.icon(
-            onPressed: widget.onLogout,
-            icon: const Icon(Icons.logout, size: 20),
-            label: const Text('Cambiar clave', style: TextStyle(fontSize: 18)),
-            style: TvStyles.button(const Color(0xFF334155)).copyWith(
-              minimumSize: WidgetStateProperty.all(const Size(150, 44)),
-            ),
-          ),
-          const SizedBox(width: 16),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (_message != null)
-              Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF102638),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: const Color(0xFF1C4966)),
-                ),
-                child: Text(
-                  _message!,
-                  style: const TextStyle(color: Color(0xFF9AD9FF), fontSize: 17),
-                ),
+            TextButton.icon(
+              onPressed: _openDiagnostic,
+              icon: const Icon(Icons.info_outline, size: 20),
+              label: const Text('Diagnóstico', style: TextStyle(fontSize: 18)),
+              style: TvStyles.button(const Color(0xFF334155)).copyWith(
+                minimumSize: WidgetStateProperty.all(const Size(140, 44)),
               ),
-            Expanded(
-              child: _catalog.apps.isEmpty
-                  ? const Center(
-                      child: Text(
-                        'El catálogo está vacío. Editá catalog.json en GitHub para agregar apps.',
-                        style: TextStyle(color: Color(0xFF9FB6C9), fontSize: 18),
-                        textAlign: TextAlign.center,
-                      ),
-                    )
-                  : GridView.builder(
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 18,
-                        mainAxisSpacing: 18,
-                        childAspectRatio: 1.55,
-                      ),
-                      itemCount: _catalog.apps.length,
-                      itemBuilder: (context, index) {
-                        final app = _catalog.apps[index];
-                        final busy = _busy.contains(app.id);
-                        final progress = _progress[app.id] ?? 0;
-                        final info = _installed[app.id] ??
-                            const InstalledInfo(
-                              installed: false,
-                              versionCode: 0,
-                              versionName: '',
-                            );
-                        final upToDate =
-                            info.installed && info.versionCode >= app.versionCode;
-                        return Card(
-                          clipBehavior: Clip.antiAlias,
-                          color: info.installed
-                              ? const Color(0xFF10281C)
-                              : const Color(0xFF111D28),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: info.installed
-                                  ? const Color(0xFF166534)
-                                  : const Color(0xFF24384A),
-                              width: info.installed ? 2 : 1,
-                            ),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(14),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  app.name,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 19,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                const SizedBox(height: 6),
-                                Text(
-                                  [
-                                    if (app.version != null)
-                                      '${upToDate ? 'Versión' : 'Versión disponible'}: v${app.version}',
-                                    app.sizeLabel,
-                                  ].where((s) => s.isNotEmpty).join('  ·  '),
-                                  style: const TextStyle(
-                                    color: Color(0xFFBFE3FA),
-                                    fontSize: 15,
-                                  ),
-                                ),
-                                if (info.installed) ...[
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    'Instalada ${info.label}',
-                                    style: const TextStyle(
-                                      color: Color(0xFF86EFAC),
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                                const Spacer(),
-                                if (busy)
-                                  LinearProgressIndicator(value: progress > 0 ? progress : null)
-                                else
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                                    children: [
-                                      SizedBox(
-                                        width: double.infinity,
-                                        height: 44,
-                                        child: FilledButton.icon(
-                                          autofocus: index == 0,
-                                          onPressed: upToDate
-                                              ? null
-                                              : () => _install(app),
-                                          icon: Icon(
-                                            upToDate
-                                                ? Icons.check_circle
-                                                : Icons.download,
-                                            size: 19,
-                                          ),
-                                          label: Flexible(
-                                            child: Text(
-                                              upToDate
-                                                  ? 'Instalada v${app.version}'
-                                                  : info.installed
-                                                      ? 'Actualizar a v${app.version}'
-                                                      : 'Instalar v${app.version}',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(fontSize: 15),
-                                            ),
-                                          ),
-                                          style: TvStyles.button(
-                                            upToDate
-                                                ? const Color(0xFF166534)
-                                                : const Color(0xFF0284C7),
-                                          ).copyWith(
-                                            minimumSize:
-                                                WidgetStateProperty.all(Size.zero),
-                                            padding: WidgetStateProperty.all(
-                                              const EdgeInsets.symmetric(
-                                                horizontal: 12,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      if (info.installed) ...[
-                                        const SizedBox(height: 6),
-                                        Row(
-                                          children: [
-                                            Expanded(
-                                              child: TextButton.icon(
-                                                onPressed: () => _open(app),
-                                                icon: const Icon(Icons.launch, size: 18),
-                                                label: const Flexible(
-                                                  child: Text(
-                                                    'Abrir',
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: TextStyle(fontSize: 15),
-                                                  ),
-                                                ),
-                                                style: TvStyles.button(
-                                                  const Color(0xFF166534),
-                                                ).copyWith(
-                                                  minimumSize:
-                                                      WidgetStateProperty.all(
-                                                    Size.zero,
-                                                  ),
-                                                  padding: WidgetStateProperty.all(
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Expanded(
-                                              child: TextButton.icon(
-                                                onPressed: () => _uninstall(app),
-                                                icon: const Icon(Icons.delete, size: 18),
-                                                label: const Flexible(
-                                                  child: Text(
-                                                    'Borrar',
-                                                    maxLines: 1,
-                                                    overflow: TextOverflow.ellipsis,
-                                                    style: TextStyle(fontSize: 15),
-                                                  ),
-                                                ),
-                                                style: TvStyles.button(
-                                                  const Color(0xFF7F1D1D),
-                                                ).copyWith(
-                                                  minimumSize:
-                                                      WidgetStateProperty.all(
-                                                    Size.zero,
-                                                  ),
-                                                  padding: WidgetStateProperty.all(
-                                                    const EdgeInsets.symmetric(
-                                                      horizontal: 8,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ],
-                                  ),
-                              ],
-                            ),
-                          ),
-                        );
-                      },
-                    ),
             ),
+            const SizedBox(width: 12),
+            TextButton.icon(
+              onPressed: () => SystemNavigator.pop(),
+              icon: const Icon(Icons.exit_to_app, size: 20),
+              label: const Text('Salir', style: TextStyle(fontSize: 18)),
+              style: TvStyles.button(const Color(0xFF334155)).copyWith(
+                minimumSize: WidgetStateProperty.all(const Size(150, 44)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            TextButton.icon(
+              onPressed: widget.onLogout,
+              icon: const Icon(Icons.logout, size: 20),
+              label: const Text(
+                'Cambiar clave',
+                style: TextStyle(fontSize: 18),
+              ),
+              style: TvStyles.button(const Color(0xFF334155)).copyWith(
+                minimumSize: WidgetStateProperty.all(const Size(150, 44)),
+              ),
+            ),
+            const SizedBox(width: 16),
           ],
         ),
+        body: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (_message != null)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 16),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF102638),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF1C4966)),
+                  ),
+                  child: Text(
+                    _message!,
+                    style: const TextStyle(
+                      color: Color(0xFF9AD9FF),
+                      fontSize: 17,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: _catalog.apps.isEmpty
+                    ? const Center(
+                        child: Text(
+                          'El catálogo está vacío. Editá catalog.json en GitHub para agregar apps.',
+                          style: TextStyle(
+                            color: Color(0xFF9FB6C9),
+                            fontSize: 18,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    : GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 18,
+                              mainAxisSpacing: 18,
+                              childAspectRatio: 1.55,
+                            ),
+                        itemCount: _catalog.apps.length,
+                        itemBuilder: (context, index) {
+                          final app = _catalog.apps[index];
+                          final busy = _busy.contains(app.id);
+                          final progress = _progress[app.id] ?? 0;
+                          final info =
+                              _installed[app.id] ??
+                              const InstalledInfo(
+                                installed: false,
+                                versionCode: 0,
+                                versionName: '',
+                              );
+                          final upToDate =
+                              info.installed &&
+                              info.versionCode >= app.versionCode;
+                          return Card(
+                            clipBehavior: Clip.antiAlias,
+                            color: info.installed
+                                ? const Color(0xFF10281C)
+                                : const Color(0xFF111D28),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(
+                                color: info.installed
+                                    ? const Color(0xFF166534)
+                                    : const Color(0xFF24384A),
+                                width: info.installed ? 2 : 1,
+                              ),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    app.name,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 19,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    [
+                                      if (app.version != null)
+                                        '${upToDate ? 'Versión' : 'Versión disponible'}: v${app.version}',
+                                      app.sizeLabel,
+                                    ].where((s) => s.isNotEmpty).join('  ·  '),
+                                    style: const TextStyle(
+                                      color: Color(0xFFBFE3FA),
+                                      fontSize: 15,
+                                    ),
+                                  ),
+                                  if (info.installed) ...[
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Instalada ${info.label}',
+                                      style: const TextStyle(
+                                        color: Color(0xFF86EFAC),
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                  const Spacer(),
+                                  if (busy)
+                                    LinearProgressIndicator(
+                                      value: progress > 0 ? progress : null,
+                                    )
+                                  else
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
+                                      children: [
+                                        SizedBox(
+                                          width: double.infinity,
+                                          height: 44,
+                                          child: FilledButton.icon(
+                                            autofocus: index == 0,
+                                            onPressed: upToDate
+                                                ? null
+                                                : () => _install(app),
+                                            icon: Icon(
+                                              upToDate
+                                                  ? Icons.check_circle
+                                                  : Icons.download,
+                                              size: 19,
+                                            ),
+                                            label: Flexible(
+                                              child: Text(
+                                                upToDate
+                                                    ? 'Instalada v${app.version}'
+                                                    : info.installed
+                                                    ? 'Actualizar a v${app.version}'
+                                                    : 'Instalar v${app.version}',
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 15,
+                                                ),
+                                              ),
+                                            ),
+                                            style:
+                                                TvStyles.button(
+                                                  upToDate
+                                                      ? const Color(0xFF166534)
+                                                      : const Color(0xFF0284C7),
+                                                ).copyWith(
+                                                  minimumSize:
+                                                      WidgetStateProperty.all(
+                                                        Size.zero,
+                                                      ),
+                                                  padding: WidgetStateProperty.all(
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                          ),
+                                        ),
+                                        if (info.installed) ...[
+                                          const SizedBox(height: 6),
+                                          Row(
+                                            children: [
+                                              Expanded(
+                                                child: TextButton.icon(
+                                                  onPressed: () => _open(app),
+                                                  icon: const Icon(
+                                                    Icons.launch,
+                                                    size: 18,
+                                                  ),
+                                                  label: const Flexible(
+                                                    child: Text(
+                                                      'Abrir',
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  style:
+                                                      TvStyles.button(
+                                                        const Color(0xFF166534),
+                                                      ).copyWith(
+                                                        minimumSize:
+                                                            WidgetStateProperty.all(
+                                                              Size.zero,
+                                                            ),
+                                                        padding:
+                                                            WidgetStateProperty.all(
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 8,
+                                                              ),
+                                                            ),
+                                                      ),
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Expanded(
+                                                child: TextButton.icon(
+                                                  onPressed: () =>
+                                                      _uninstall(app),
+                                                  icon: const Icon(
+                                                    Icons.delete,
+                                                    size: 18,
+                                                  ),
+                                                  label: const Flexible(
+                                                    child: Text(
+                                                      'Borrar',
+                                                      maxLines: 1,
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                        fontSize: 15,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  style:
+                                                      TvStyles.button(
+                                                        const Color(0xFF7F1D1D),
+                                                      ).copyWith(
+                                                        minimumSize:
+                                                            WidgetStateProperty.all(
+                                                              Size.zero,
+                                                            ),
+                                                        padding:
+                                                            WidgetStateProperty.all(
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 8,
+                                                              ),
+                                                            ),
+                                                      ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ),
-  );
+    );
   }
 }

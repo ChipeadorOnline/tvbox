@@ -17,7 +17,7 @@ La PC **no tiene que estar encendida**: todo está en Render.
 
 - Release publicado: https://github.com/ChipeadorOnline/tvbox/releases/latest
 - Copia local: `apk\tvbox-updater-release.apk`
-- Versión actual: v1.0.17 (sale en la pantalla de clave)
+- Versión actual: v1.0.18 (sale en la pantalla de clave)
 - Incluye: navegación con flechas del control, OK para ingresar, clave con
   mayúsculas y guiones automáticos, opción de launcher y un botón
   **Diagnóstico** que muestra la clave guardada, el estado del servidor y el
@@ -48,6 +48,8 @@ La PC **no tiene que estar encendida**: todo está en Render.
   permite generar claves de prueba de 5 o 10 minutos con el campo **Minutos**.
   Prueba verificada el 27/11/2026: una clave de 10 minutos devolvió **403**
   apenas venció en el servidor.
+- v1.0.18 corrige el error **"No se pudo cargar: Null check operator..."** que
+  aparecía al volver del instalador de Android durante una actualización.
 - Si el TV quedó en v1.0.6 o anterior, hay que instalar **una sola vez** con el
   link corto para salir del bucle de caché. Después ya se actualiza desde la app.
 
@@ -103,7 +105,7 @@ Cuando cambie `catalog.json`, copiarlo también a
 y es la que abre la app si GitHub no responde.
 
 ### Instalar el APK en un TV Box
-Con Downloader: https://is.gd/LtHKCx
+Con Downloader: https://is.gd/wl2tE7
 
 ### Clientes: clave individual y renovación
 Cada amigo tiene su **propia clave** generada en el panel con su nombre y

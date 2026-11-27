@@ -60,6 +60,8 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
   Catalog? _catalog;
   LicenseState? _license;
   String _error = '';
+  bool _installing = false;
+  bool _dialogOpen = false;
 
   @override
   void initState() {
@@ -77,7 +79,11 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state != AppLifecycleState.resumed || _stage != _Stage.ready) return;
-    _start(showNotice: true);
+    // Si volvemos del instalador de Android, recargamos en silencio: mostrar
+    // un diálogo justo en ese momento puede fallar en algunos TV Box.
+    final afterInstaller = _installing;
+    _installing = false;
+    _start(showNotice: !afterInstaller);
   }
 
   Future<void> _start({bool showNotice = true}) async {
@@ -136,72 +142,91 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
   }
 
   Future<void> _showSelfUpdateNotice() async {
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF111D28),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(
-          children: const [
-            Icon(Icons.system_update, size: 32, color: Color(0xFF38BDF8)),
-            SizedBox(width: 12),
-            Text('Actualización disponible',
-                style: TextStyle(color: Colors.white, fontSize: 24)),
+    if (!mounted || _dialogOpen || _installing) return;
+    _dialogOpen = true;
+    try {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: const Color(0xFF111D28),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.system_update, size: 32, color: Color(0xFF38BDF8)),
+              SizedBox(width: 12),
+              Text(
+                'Actualización disponible',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ],
+          ),
+          content: const Text(
+            'Hay una versión nueva del Actualizador TV. '
+            'Andá a la tarjeta "Actualizador TV" y apretá Actualizar.',
+            style: TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+          ),
+          actions: [
+            FilledButton(
+              autofocus: true,
+              onPressed: () => Navigator.pop(dialogContext),
+              style: TvStyles.button(const Color(0xFF0284C7)),
+              child: const Text('Entendido', style: TextStyle(fontSize: 19)),
+            ),
           ],
         ),
-        content: const Text(
-          'Hay una versión nueva del Actualizador TV. '
-          'Andá a la tarjeta "Actualizador TV" y apretá Actualizar.',
-          style: TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
-        ),
-        actions: [
-          FilledButton(
-            autofocus: true,
-            onPressed: () => Navigator.pop(dialogContext),
-            style: TvStyles.button(const Color(0xFF0284C7)),
-            child: const Text('Entendido', style: TextStyle(fontSize: 19)),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      _dialogOpen = false;
+    }
   }
 
   Future<void> _showUpdateNotice(Catalog catalog) async {
     final count = catalog.apps.length;
-    if (!mounted) return;
-    await showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: const Color(0xFF111D28),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: Row(
-          children: const [
-            Icon(Icons.system_update, color: Color(0xFF38BDF8), size: 32),
-            SizedBox(width: 12),
-            Text('Hay novedades', style: TextStyle(color: Colors.white, fontSize: 24)),
+    if (!mounted || _dialogOpen || _installing) return;
+    _dialogOpen = true;
+    try {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: const Color(0xFF111D28),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          title: Row(
+            children: const [
+              Icon(Icons.system_update, color: Color(0xFF38BDF8), size: 32),
+              SizedBox(width: 12),
+              Text(
+                'Hay novedades',
+                style: TextStyle(color: Colors.white, fontSize: 24),
+              ),
+            ],
+          ),
+          content: Text(
+            'El catálogo tiene $count aplicación${count == 1 ? '' : 'es'} disponible'
+            '${count == 1 ? '' : 's'}. Revisá las actualizaciones para instalarlas.',
+            style: const TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+          ),
+          actions: [
+            FilledButton(
+              autofocus: true,
+              onPressed: () => Navigator.pop(dialogContext),
+              style: FilledButton.styleFrom(
+                backgroundColor: const Color(0xFF0284C7),
+                minimumSize: const Size(160, 52),
+              ),
+              child: const Text('Ver ahora', style: TextStyle(fontSize: 19)),
+            ),
           ],
         ),
-        content: Text(
-          'El catálogo tiene $count aplicación${count == 1 ? '' : 'es'} disponible'
-          '${count == 1 ? '' : 's'}. Revisá las actualizaciones para instalarlas.',
-          style: const TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
-        ),
-        actions: [
-          FilledButton(
-            autofocus: true,
-            onPressed: () => Navigator.pop(dialogContext),
-            style: FilledButton.styleFrom(
-              backgroundColor: const Color(0xFF0284C7),
-              minimumSize: const Size(160, 52),
-            ),
-            child: const Text('Ver ahora', style: TextStyle(fontSize: 19)),
-          ),
-        ],
-      ),
-    );
+      );
+    } finally {
+      _dialogOpen = false;
+    }
   }
 
   Future<void> _logout() async {
@@ -263,12 +288,19 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.wifi_off, size: 64, color: Color(0xFFF59E0B)),
+                    const Icon(
+                      Icons.wifi_off,
+                      size: 64,
+                      color: Color(0xFFF59E0B),
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'No se pudo cargar: $_error',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+                      style: const TextStyle(
+                        color: Color(0xFFC6D5E2),
+                        fontSize: 18,
+                      ),
                     ),
                     const SizedBox(height: 24),
                     FilledButton(
@@ -295,12 +327,19 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.refresh, size: 64, color: Color(0xFFF59E0B)),
+                      const Icon(
+                        Icons.refresh,
+                        size: 64,
+                        color: Color(0xFFF59E0B),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'Faltaron datos para abrir el catálogo. Probá de nuevo.',
                         textAlign: TextAlign.center,
-                        style: TextStyle(color: Color(0xFFC6D5E2), fontSize: 18),
+                        style: TextStyle(
+                          color: Color(0xFFC6D5E2),
+                          fontSize: 18,
+                        ),
                       ),
                       const SizedBox(height: 24),
                       FilledButton(
@@ -325,6 +364,7 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
           downloadService: widget.downloadService,
           installService: widget.installService,
           onLogout: _logout,
+          onInstalling: (active) => _installing = active,
         );
     }
   }
