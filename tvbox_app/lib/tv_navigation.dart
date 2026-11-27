@@ -5,17 +5,33 @@ import 'package:flutter/services.dart';
 /// Envuelve una pantalla completa; los eventos burbujean desde el widget
 /// enfocado hasta acá.
 class TvNavigation extends StatelessWidget {
-  const TvNavigation({
-    super.key,
-    required this.child,
-    this.onConfirm,
-  });
+  const TvNavigation({super.key, required this.child, this.onConfirm});
 
   final Widget child;
 
   /// Si se indica, el botón OK del control ejecuta esta acción.
   /// Si es null, OK deja que el botón enfocado haga su trabajo normal.
   final VoidCallback? onConfirm;
+
+  /// Mueve el foco y lo centra en el scroll cuando hace falta. Así las tarjetas
+  /// no quedan cortadas al recorrer la lista con el control remoto.
+  void _moveFocus(BuildContext context, {required bool next}) {
+    final scope = FocusScope.of(context);
+    if (next) {
+      scope.nextFocus();
+    } else {
+      scope.previousFocus();
+    }
+    final focusContext = FocusManager.instance.primaryFocus?.context;
+    if (focusContext == null || !focusContext.mounted) return;
+    if (Scrollable.maybeOf(focusContext) == null) return;
+    Scrollable.ensureVisible(
+      focusContext,
+      alignment: 0.5,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,15 +43,16 @@ class TvNavigation extends StatelessWidget {
         final key = event.logicalKey;
         if (key == LogicalKeyboardKey.arrowDown ||
             key == LogicalKeyboardKey.arrowRight) {
-          FocusScope.of(context).nextFocus();
+          _moveFocus(context, next: true);
           return KeyEventResult.handled;
         }
         if (key == LogicalKeyboardKey.arrowUp ||
             key == LogicalKeyboardKey.arrowLeft) {
-          FocusScope.of(context).previousFocus();
+          _moveFocus(context, next: false);
           return KeyEventResult.handled;
         }
-        final isOk = key == LogicalKeyboardKey.enter ||
+        final isOk =
+            key == LogicalKeyboardKey.enter ||
             key == LogicalKeyboardKey.numpadEnter ||
             key == LogicalKeyboardKey.select;
         if (isOk && onConfirm != null) {
@@ -55,17 +72,17 @@ class TvStyles {
   const TvStyles._();
 
   static ButtonStyle button(Color background) => ButtonStyle(
-        backgroundColor: WidgetStateProperty.all(background),
-        foregroundColor: WidgetStateProperty.all(Colors.white),
-        minimumSize: WidgetStateProperty.all(const Size(200, 52)),
-        shape: WidgetStateProperty.all(
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        side: WidgetStateProperty.resolveWith<BorderSide>((states) {
-          if (states.contains(WidgetState.focused)) {
-            return const BorderSide(color: Colors.white, width: 3);
-          }
-          return BorderSide.none;
-        }),
-      );
+    backgroundColor: WidgetStateProperty.all(background),
+    foregroundColor: WidgetStateProperty.all(Colors.white),
+    minimumSize: WidgetStateProperty.all(const Size(200, 52)),
+    shape: WidgetStateProperty.all(
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ),
+    side: WidgetStateProperty.resolveWith<BorderSide>((states) {
+      if (states.contains(WidgetState.focused)) {
+        return const BorderSide(color: Colors.white, width: 3);
+      }
+      return BorderSide.none;
+    }),
+  );
 }

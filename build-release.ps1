@@ -2,8 +2,8 @@ param(
   [Parameter(Mandatory = $true)]
   [string]$ApiUrl,
   [string]$CatalogUrl = 'https://raw.githubusercontent.com/ChipeadorOnline/tvbox/main/catalog.json',
-  [string]$BuildName = '1.0.18',
-  [int]$BuildNumber = 18
+  [string]$BuildName = '1.0.19',
+  [int]$BuildNumber = 19
 )
 
 $ErrorActionPreference = 'Stop'

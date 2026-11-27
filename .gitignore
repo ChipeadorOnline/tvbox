@@ -11,6 +11,7 @@ tvbox_app/android/local.properties
 *.keystore
 tvbox-release-secrets.txt
 clave.txt
+clave-prueba-10min.txt
 tools/cloudflared.exe
 tools/tunnel.log
 tools/tunnel.log.err

@@ -143,7 +143,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.18',
+          version: 'v1.0.19',
         ),
       ),
     );
@@ -389,13 +389,15 @@ class _CatalogScreenState extends State<CatalogScreen> {
                         ),
                       )
                     : GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              crossAxisSpacing: 18,
-                              mainAxisSpacing: 18,
-                              childAspectRatio: 1.55,
-                            ),
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 560,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          mainAxisExtent:
+                              MediaQuery.sizeOf(context).height < 720
+                              ? 200.0
+                              : 230.0,
+                        ),
                         itemCount: _catalog.apps.length,
                         itemBuilder: (context, index) {
                           final app = _catalog.apps[index];
@@ -426,7 +428,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               ),
                             ),
                             child: Padding(
-                              padding: const EdgeInsets.all(14),
+                              padding: const EdgeInsets.all(12),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -436,7 +438,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                     overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontSize: 19,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -447,21 +449,13 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         '${upToDate ? 'Versión' : 'Versión disponible'}: v${app.version}',
                                       app.sizeLabel,
                                     ].where((s) => s.isNotEmpty).join('  ·  '),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: const TextStyle(
                                       color: Color(0xFFBFE3FA),
-                                      fontSize: 15,
+                                      fontSize: 13,
                                     ),
                                   ),
-                                  if (info.installed) ...[
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'Instalada ${info.label}',
-                                      style: const TextStyle(
-                                        color: Color(0xFF86EFAC),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
                                   const Spacer(),
                                   if (busy)
                                     LinearProgressIndicator(
@@ -474,7 +468,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                       children: [
                                         SizedBox(
                                           width: double.infinity,
-                                          height: 44,
+                                          height: 38,
                                           child: FilledButton.icon(
                                             autofocus: index == 0,
                                             onPressed: upToDate
@@ -496,7 +490,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: const TextStyle(
-                                                  fontSize: 15,
+                                                  fontSize: 14,
                                                 ),
                                               ),
                                             ),
@@ -536,7 +530,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: TextStyle(
-                                                        fontSize: 15,
+                                                        fontSize: 14,
                                                       ),
                                                     ),
                                                   ),
@@ -573,7 +567,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       style: TextStyle(
-                                                        fontSize: 15,
+                                                        fontSize: 14,
                                                       ),
                                                     ),
                                                   ),
