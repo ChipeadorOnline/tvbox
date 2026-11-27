@@ -10,8 +10,8 @@ import '../models.dart';
 
 class CatalogService {
   CatalogService({http.Client? client, SharedPreferences? sharedPreferences})
-      : _client = client ?? http.Client(),
-        _prefs = sharedPreferences;
+    : _client = client ?? http.Client(),
+      _prefs = sharedPreferences;
 
   final http.Client _client;
   SharedPreferences? _prefs;
@@ -19,6 +19,7 @@ class CatalogService {
   static const String cacheKey = 'catalog_cache';
   static const String signatureKey = 'catalog_signature';
   static const String pendingKey = 'pending_catalog_update';
+  static const String installerNoticeKey = 'skip_update_notice_once';
 
   Future<SharedPreferences> get prefs async =>
       _prefs ??= await SharedPreferences.getInstance();
@@ -62,6 +63,23 @@ class CatalogService {
       final bundled = await rootBundle.loadString('assets/catalog.json');
       return Catalog.fromRawJson(bundled);
     }
+  }
+
+  /// Se llama justo antes de abrir el instalador de Android. La marca se guarda
+  /// en disco porque Android reinicia la app al instalar: el flag en memoria
+  /// se pierde y el aviso de "novedades" aparecía en el arranque siguiente.
+  Future<void> markInstallerOpening() async {
+    final p = await prefs;
+    await p.setBool(installerNoticeKey, true);
+  }
+
+  /// Consume una sola vez la marca de instalación. Devuelve true cuando la app
+  /// está abriendo justo después de instalar, para no mostrar diálogos.
+  Future<bool> consumeInstallerNotice() async {
+    final p = await prefs;
+    final skip = p.getBool(installerNoticeKey) ?? false;
+    if (skip) await p.setBool(installerNoticeKey, false);
+    return skip;
   }
 
   /// true cuando cambió la lista o subió el versionCode de alguna app.

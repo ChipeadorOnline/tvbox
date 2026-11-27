@@ -62,6 +62,7 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
   String _error = '';
   bool _installing = false;
   bool _dialogOpen = false;
+  bool _noticeScheduled = false;
 
   @override
   void initState() {
@@ -88,6 +89,10 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
 
   Future<void> _start({bool showNotice = true}) async {
     if (mounted) setState(() => _stage = _Stage.loading);
+
+    // Sobrevive al reinicio que hace Android al instalar un APK.
+    final afterInstaller = await widget.catalogService.consumeInstallerNotice();
+    final allowNotice = showNotice && !afterInstaller;
 
     final allowed = await widget.licenseService.isAllowed();
     if (!allowed) {
@@ -116,10 +121,24 @@ class _TvboxAppState extends State<TvboxApp> with WidgetsBindingObserver {
         _stage = _Stage.ready;
       });
       final selfUpdate = await _hasSelfUpdate(catalog);
-      if (showNotice && selfUpdate) {
-        await _showSelfUpdateNotice();
-      } else if (showNotice && hasNews) {
-        await _showUpdateNotice(catalog);
+      if (allowNotice && !_noticeScheduled) {
+        _noticeScheduled = true;
+        // Mostrar el diálogo apenas termina el setState puede fallar en TV Box:
+        // el Navigator todavía no tiene lista la pantalla. Esperamos al frame.
+        WidgetsBinding.instance.addPostFrameCallback((_) async {
+          _noticeScheduled = false;
+          if (!mounted || _dialogOpen || _installing) return;
+          try {
+            if (selfUpdate) {
+              await _showSelfUpdateNotice();
+            } else if (hasNews) {
+              await _showUpdateNotice(catalog);
+            }
+          } catch (e) {
+            // Un aviso que no se muestra nunca debe dejar la app en error.
+            debugPrint('No se pudo mostrar el aviso de actualización: $e');
+          }
+        });
       }
     } catch (e) {
       if (mounted) {

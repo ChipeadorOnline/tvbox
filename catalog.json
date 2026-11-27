@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-27T14:15:00Z",
+  "updatedAt": "2026-11-27T18:05:00Z",
   "apps": [
     {
       "id": "tvbox-updater",
@@ -7,11 +7,11 @@
       "fileName": "tvbox-updater.apk",
       "packageName": "com.chipeadoronline.tvbox_updater",
       "url": "https://github.com/ChipeadorOnline/tvbox/releases/latest/download/app-release.apk",
-      "version": "1.0.19",
-      "versionCode": 19,
+      "version": "1.0.20",
+      "versionCode": 20,
       "size": 0,
       "sha256": "",
-      "notes": "Mejora el diseño de las tarjetas y el recorrido con el control remoto."
+      "notes": "Corrige el aviso al actualizar y evita que el foco vuelva al medio al bajar."
     },
     {
       "id": "smarttube-stable",

@@ -18,9 +18,9 @@ de Android. Eso es una limitación del sistema, no de la app.
 
 ## 2. Estado actual
 
-- Versión vigente: **v1.0.19** (`versionCode 19`, aparece en la pantalla de clave y en Diagnóstico).
-- Link corto para instalar en la TV: **https://is.gd/jJqFce**
-- Release: https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.19/app-release.apk
+- Versión vigente: **v1.0.20** (`versionCode 20`, aparece en la pantalla de clave y en Diagnóstico).
+- Link corto para instalar en la TV: **https://is.gd/zlDIH0**
+- Release: https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.20/app-release.apk
 - API de licencias: https://tvbox-license.onrender.com (`/api/health` debe responder `ok`).
 - Panel de administración: https://tvbox-license.onrender.com/admin
 - Catálogo público: 19 apps.
@@ -238,6 +238,10 @@ Los secretos del keystore y de Render están en
 - Desde v1.0.19 las tarjetas se adaptan al ancho de la pantalla, la versión se
   corta con `...` en una línea y el foco se centra al recorrer la lista. Así no
   se cortan textos largos como el de Disney+.
+- Desde v1.0.20, después de actualizar no aparece el error **"Null check
+  operator used on a null value"** al abrir la app: el aviso se muestra recién
+  cuando la pantalla está lista. Tampoco se da una vuelta al llegar abajo: si
+  seguís bajando en la última tarjeta, te quedás ahí.
 - En la app hay botón **Diagnóstico**: muestra versión, API, hora del equipo,
   clave guardada, resultado de `/api/health` y de la validación. Es lo primero
   que hay que mirar si algo falla.
@@ -245,7 +249,7 @@ Los secretos del keystore y de Render están en
 ## 9. Instalación en la TV
 
 1. Instalar Downloader en la TV.
-2. Abrir Downloader y cargar el link corto: **https://is.gd/jJqFce**
+2. Abrir Downloader y cargar el link corto: **https://is.gd/zlDIH0**
 3. Dar permiso de instalación de apps desconocidas a Downloader/Actualizador.
 4. Instalar y abrir.
 5. Poner la clave.

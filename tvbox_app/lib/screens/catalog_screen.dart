@@ -143,7 +143,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.19',
+          version: 'v1.0.20',
         ),
       ),
     );
@@ -271,9 +271,11 @@ class _CatalogScreenState extends State<CatalogScreen> {
       if (mounted) {
         setState(() => _message = 'Abriendo el instalador de Android...');
       }
-      // Avisamos antes de salir a la actividad del sistema. Al volver, la
-      // pantalla principal recarga sin mostrar avisos (evita el error de
-      // Navigator al abrir un diálogo durante el cambio de actividad).
+      // Avisamos antes de salir a la actividad del sistema. La marca se guarda
+      // en disco porque Android reinicia la app al instalar: así el arranque
+      // siguiente tampoco muestra avisos (evita el error de Navigator al abrir
+      // un diálogo durante el cambio de actividad).
+      await widget.catalogService.markInstallerOpening();
       widget.onInstalling?.call(true);
       final result = await widget.installService.openApk(file);
       if (result.type != ResultType.done) {

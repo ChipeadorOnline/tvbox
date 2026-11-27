@@ -17,11 +17,26 @@ class TvNavigation extends StatelessWidget {
   /// no quedan cortadas al recorrer la lista con el control remoto.
   void _moveFocus(BuildContext context, {required bool next}) {
     final scope = FocusScope.of(context);
-    if (next) {
-      scope.nextFocus();
+    final current = FocusManager.instance.primaryFocus;
+    final nodes = scope.traversalDescendants
+        .where((n) => n.canRequestFocus && !n.skipTraversal)
+        .toList();
+
+    // Sin "wrap": al llegar al último botón, seguir bajando no debe llevar
+    // a las tarjetas del medio. Nos quedamos en el último (o en el primero).
+    if (current != null && nodes.isNotEmpty) {
+      final index = nodes.indexOf(current);
+      if (index >= 0) {
+        final target = index + (next ? 1 : -1);
+        if (target < 0 || target >= nodes.length) return;
+        nodes[target].requestFocus();
+      } else {
+        next ? scope.nextFocus() : scope.previousFocus();
+      }
     } else {
-      scope.previousFocus();
+      next ? scope.nextFocus() : scope.previousFocus();
     }
+
     final focusContext = FocusManager.instance.primaryFocus?.context;
     if (focusContext == null || !focusContext.mounted) return;
     if (Scrollable.maybeOf(focusContext) == null) return;
