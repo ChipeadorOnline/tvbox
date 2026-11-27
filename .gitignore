@@ -9,6 +9,7 @@ tvbox_app/.flutter-plugins-dependencies
 tvbox_app/android/local.properties
 *.jks
 *.keystore
+tvbox-release-secrets.txt
 tools/cloudflared.exe
 tools/tunnel.log
 tools/tunnel.log.err

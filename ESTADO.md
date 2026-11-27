@@ -1,8 +1,8 @@
 # Estado del proyecto
 
-Manual operativo completo: [MANUAL.md](MANUAL.md). TV Box
+Manual operativo completo: [MANUAL.md](MANUAL.md).
 
-Carpeta: `C:\Users\ChipeadorOnline\Documents\tvbox`
+Carpeta: `C:\Users\ChipeadorOnline\Downloads\backup tvbox`
 GitHub: https://github.com/ChipeadorOnline/tvbox
 
 ## Servicios activos
@@ -56,7 +56,7 @@ Vence el 26/12/2026. Se acepta con guiones, sin guiones y en minúsculas.
 
 ## Secretos (NOSUBIR a GitHub)
 
-`C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt`
+`C:\Users\ChipeadorOnline\Downloads\tvbox-release-secrets.txt`
 
 Contiene: keystore, contraseñas del keystore, `ADMIN_TOKEN` y `LICENSE_PEPPER`
 de Render. Si se pierde el `LICENSE_PEPPER`, las claves emitidas dejan de funcionar.

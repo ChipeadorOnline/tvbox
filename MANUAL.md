@@ -50,7 +50,7 @@ aprieta **Cambiar clave** en la TV.
 URL: https://tvbox-license.onrender.com/admin
 
 La contraseña del panel es `RENDER_ADMIN_TOKEN` (está en
-`C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt`). **No es la
+`C:\Users\ChipeadorOnline\Downloads\tvbox-release-secrets.txt`). **No es la
 clave del cliente y no hay que subirla a GitHub.**
 
 ### Generar una clave
@@ -196,7 +196,7 @@ El token de GitHub con scopes `gist, repo, workflow` está solo en Render, nunca
 en el repo ni en el APK.
 
 Los secretos del keystore y de Render están en
-`C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt`, **fuera del repo**.
+`C:\Users\ChipeadorOnline\Downloads\tvbox-release-secrets.txt`, **fuera del repo**.
 
 ## 8. Resistencia a fallas de red
 

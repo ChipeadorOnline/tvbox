@@ -105,7 +105,7 @@ El APK queda en `tvbox_app/build/app/outputs/flutter-apk/app-release.apk` y una
 copia en `apk/tvbox-updater-release.apk`.
 
 > En esta PC el keystore está en `keystore/tvbox-release.jks` y las claves en
-> `C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt` (fuera del repo).
+> `C:\Users\ChipeadorOnline\Downloads\tvbox-release-secrets.txt` (fuera del repo).
 > **No subas ese archivo a GitHub.** La huella del certificado es
 > `2C:BC:D5:E2:EB:1B:14:08:83:34:D3:B9:D0:2D:71:B9:F2:E7:73:8D:4A:CF:0B:18:11:9A:48:0E:E9:F7:12:69:A`.
 > APK publicado por GitHub Actions:
@@ -205,7 +205,7 @@ curl -X POST https://tvbox-license.onrender.com/api/admin/licenses ^
 
 Guardá `LICENSE_PEPPER` en un lugar seguro: si lo cambiás, **todas** las claves
 emitidas dejan de funcionar. Los valores de producción están en
-`C:\Users\ChipeadorOnline\Documents\tvbox-release-secrets.txt`.
+`C:\Users\ChipeadorOnline\Downloads\tvbox-release-secrets.txt`.
 
 ## 6. Publicar la API con HTTPS
 
