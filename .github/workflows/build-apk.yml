@@ -45,8 +45,8 @@ jobs:
         run: |
           export KEYSTORE_FILE="$HOME/.android/tvbox-release.jks"
           flutter build apk --release \
-            --build-name=1.0.15 \
-            --build-number=${{ vars.APP_BUILD_NUMBER || '15' }} \
+            --build-name=1.0.16 \
+            --build-number=${{ vars.APP_BUILD_NUMBER || '16' }} \
             --dart-define=API_URL=${{ vars.API_URL }} \
             --dart-define=CATALOG_URL=https://raw.githubusercontent.com/${{ github.repository }}/main/catalog.json
 

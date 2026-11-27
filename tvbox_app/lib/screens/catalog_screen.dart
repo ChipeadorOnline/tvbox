@@ -135,7 +135,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.15',
+          version: 'v1.0.16',
         ),
       ),
     );
@@ -372,6 +372,8 @@ class _CatalogScreenState extends State<CatalogScreen> {
                               versionCode: 0,
                               versionName: '',
                             );
+                        final upToDate =
+                            info.installed && info.versionCode >= app.versionCode;
                         return Card(
                           clipBehavior: Clip.antiAlias,
                           color: info.installed
@@ -405,7 +407,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                 Text(
                                   [
                                     if (app.version != null)
-                                      'Versión disponible: v${app.version}',
+                                      '${upToDate ? 'Versión' : 'Versión disponible'}: v${app.version}',
                                     app.sizeLabel,
                                   ].where((s) => s.isNotEmpty).join('  ·  '),
                                   style: const TextStyle(
@@ -435,20 +437,31 @@ class _CatalogScreenState extends State<CatalogScreen> {
                                         height: 44,
                                         child: FilledButton.icon(
                                           autofocus: index == 0,
-                                          onPressed: () => _install(app),
-                                          icon: const Icon(Icons.download, size: 19),
+                                          onPressed: upToDate
+                                              ? null
+                                              : () => _install(app),
+                                          icon: Icon(
+                                            upToDate
+                                                ? Icons.check_circle
+                                                : Icons.download,
+                                            size: 19,
+                                          ),
                                           label: Flexible(
                                             child: Text(
-                                              info.installed
-                                                  ? 'Actualizar a v${app.version}'
-                                                  : 'Instalar v${app.version}',
+                                              upToDate
+                                                  ? 'Instalada v${app.version}'
+                                                  : info.installed
+                                                      ? 'Actualizar a v${app.version}'
+                                                      : 'Instalar v${app.version}',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               style: const TextStyle(fontSize: 15),
                                             ),
                                           ),
                                           style: TvStyles.button(
-                                            const Color(0xFF0284C7),
+                                            upToDate
+                                                ? const Color(0xFF166534)
+                                                : const Color(0xFF0284C7),
                                           ).copyWith(
                                             minimumSize:
                                                 WidgetStateProperty.all(Size.zero),
