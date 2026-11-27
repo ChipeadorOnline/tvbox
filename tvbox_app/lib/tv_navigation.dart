@@ -17,24 +17,14 @@ class TvNavigation extends StatelessWidget {
   /// no quedan cortadas al recorrer la lista con el control remoto.
   void _moveFocus(BuildContext context, {required bool next}) {
     final scope = FocusScope.of(context);
-    final current = FocusManager.instance.primaryFocus;
-    final nodes = scope.traversalDescendants
-        .where((n) => n.canRequestFocus && !n.skipTraversal)
-        .toList();
-
-    // Sin "wrap": al llegar al último botón, seguir bajando no debe llevar
-    // a las tarjetas del medio. Nos quedamos en el último (o en el primero).
-    if (current != null && nodes.isNotEmpty) {
-      final index = nodes.indexOf(current);
-      if (index >= 0) {
-        final target = index + (next ? 1 : -1);
-        if (target < 0 || target >= nodes.length) return;
-        nodes[target].requestFocus();
-      } else {
-        next ? scope.nextFocus() : scope.previousFocus();
-      }
+    // Flutter ordena por posición (ReadingOrderTraversalPolicy). El default
+    // hace "closedLoop": del último vuelve al primero. Con stop nos quedamos
+    // en el borde, sin saltos al menú ni a las tarjetas del medio.
+    scope.traversalEdgeBehavior = TraversalEdgeBehavior.stop;
+    if (next) {
+      scope.nextFocus();
     } else {
-      next ? scope.nextFocus() : scope.previousFocus();
+      scope.previousFocus();
     }
 
     final focusContext = FocusManager.instance.primaryFocus?.context;
@@ -51,6 +41,11 @@ class TvNavigation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Focus(
+      // Este Focus solo escucha las teclas que burbujean desde los controles
+      // hijos. No debe ser un destino del foco: si lo fuera, al subir desde el
+      // primer botón el foco caía acá y parecía que el menú quedaba trabado.
+      canRequestFocus: false,
+      skipTraversal: true,
       onKeyEvent: (node, event) {
         if (event is! KeyDownEvent && event is! KeyRepeatEvent) {
           return KeyEventResult.ignored;

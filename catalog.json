@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-27T18:05:00Z",
+  "updatedAt": "2026-11-27T18:30:00Z",
   "apps": [
     {
       "id": "tvbox-updater",
@@ -7,11 +7,11 @@
       "fileName": "tvbox-updater.apk",
       "packageName": "com.chipeadoronline.tvbox_updater",
       "url": "https://github.com/ChipeadorOnline/tvbox/releases/latest/download/app-release.apk",
-      "version": "1.0.20",
-      "versionCode": 20,
+      "version": "1.0.21",
+      "versionCode": 21,
       "size": 0,
       "sha256": "",
-      "notes": "Corrige el aviso al actualizar y evita que el foco vuelva al medio al bajar."
+      "notes": "Corrige el orden del foco: no salta al menú al subir desde Urban VPN y el foco no cae en un widget invisible."
     },
     {
       "id": "smarttube-stable",

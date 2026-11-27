@@ -17,7 +17,7 @@ La PC **no tiene que estar encendida**: todo está en Render.
 
 - Release publicado: https://github.com/ChipeadorOnline/tvbox/releases/latest
 - Copia local: `apk\tvbox-updater-release.apk`
-- Versión actual: v1.0.20 (sale en la pantalla de clave)
+- Versión actual: v1.0.21 (sale en la pantalla de clave)
 - Incluye: navegación con flechas del control, OK para ingresar, clave con
   mayúsculas y guiones automáticos, opción de launcher y un botón
   **Diagnóstico** que muestra la clave guardada, el estado del servidor y el
@@ -55,8 +55,12 @@ La PC **no tiene que estar encendida**: todo está en Render.
   la lista con el control.
 - v1.0.20 evita el error **"Null check operator..."** en el arranque posterior
   a una instalación (Android reinicia la app y el aviso se mostraba antes de
-  que la pantalla estuviera lista). Además, al llegar al final de la lista,
-  seguir bajando ya no devuelve el foco a las tarjetas del medio.
+  que la pantalla estuviera lista).
+- v1.0.21 corrige el orden del foco: vuelve a usar el orden visual de Flutter
+  y solo corta el borde (`TraversalEdgeBehavior.stop`). Ya no salta al menú
+  al subir desde Urban VPN, y el foco no cae en el widget invisible que
+  envolvía la pantalla (eso podía dejar el menú "trabado"). Hay test
+  de regresión para ambos bordes.
 - Si el TV quedó en v1.0.6 o anterior, hay que instalar **una sola vez** con el
   link corto para salir del bucle de caché. Después ya se actualiza desde la app.
 
@@ -112,7 +116,7 @@ Cuando cambie `catalog.json`, copiarlo también a
 y es la que abre la app si GitHub no responde.
 
 ### Instalar el APK en un TV Box
-Con Downloader: https://is.gd/zlDIH0
+Con Downloader: https://is.gd/mr3k2K
 
 ### Clientes: clave individual y renovación
 Cada amigo tiene su **propia clave** generada en el panel con su nombre y
