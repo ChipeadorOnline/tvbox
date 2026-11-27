@@ -135,7 +135,7 @@ class _CatalogScreenState extends State<CatalogScreen> {
           licenseService: widget.licenseService,
           installService: widget.installService,
           catalog: _catalog,
-          version: 'v1.0.14',
+          version: 'v1.0.15',
         ),
       ),
     );

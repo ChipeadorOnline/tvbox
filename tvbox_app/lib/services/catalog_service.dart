@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -56,7 +57,10 @@ class CatalogService {
       if (cached != null && cached.isNotEmpty) {
         return Catalog.fromRawJson(cached);
       }
-      rethrow;
+      // Ni red ni caché: usamos la copia que viene dentro del APK.
+      debugPrint('Catálogo: usando copia incluida en la app');
+      final bundled = await rootBundle.loadString('assets/catalog.json');
+      return Catalog.fromRawJson(bundled);
     }
   }
 

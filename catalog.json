@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-27T02:00:00Z",
+  "updatedAt": "2026-11-27T02:30:00Z",
   "apps": [
     {
       "id": "tvbox-updater",
@@ -7,11 +7,11 @@
       "fileName": "tvbox-updater.apk",
       "packageName": "com.chipeadoronline.tvbox_updater",
       "url": "https://github.com/ChipeadorOnline/tvbox/releases/latest/download/app-release.apk",
-      "version": "1.0.14",
-      "versionCode": 14,
+      "version": "1.0.15",
+      "versionCode": 15,
       "size": 0,
       "sha256": "",
-      "notes": "Reintentos extra al conectar: el catálogo y la licencia cargan aunque Render esté despertando."
+      "notes": "Catálogo incluido dentro del APK y respaldo offline de licencia: la app abre aunque fallen GitHub o Render."
     },
     {
       "id": "smarttube-stable",

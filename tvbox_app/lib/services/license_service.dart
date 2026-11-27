@@ -111,11 +111,23 @@ class LicenseService {
     late final http.Response response;
     try {
       response = await _post('/api/license/validate', {'key': key});
-    } catch (_) {
-      // Si ya entramos con esta misma clave, la tolerancia sin internet aplica.
-      if (await canEnterOffline(key) && cachedRaw != null) {
+    } catch (e) {
+      debugPrint('Validación de licencia (red): $e');
+      // Si ya entramos con esta clave, la tolerancia sin internet aplica.
+      // No exigimos la cola guardada: versiones anteriores no la escribieron.
+      if (cachedRaw != null) {
         final cached = LicenseState.fromJson(jsonDecode(cachedRaw));
-        return cached.copyWith(fromCache: true);
+        final notExpired = cached.expiresAt == null ||
+            cached.expiresAt!.isAfter(DateTime.now());
+        final storedTail = p.getString(keyTailKey);
+        final sameKey = storedTail == null ||
+            storedTail == _tail(key) ||
+            (await getStoredKey()) == key;
+        if (cached.active && notExpired && sameKey &&
+            DateTime.now().difference(cached.checkedAt).inDays <=
+                AppConfig.offlineGraceDays) {
+          return cached.copyWith(fromCache: true);
+        }
       }
       throw const LicenseException(
         'Sin conexión con el servidor. La app está esperando a que '
@@ -162,7 +174,8 @@ class LicenseService {
     if (cached.expiresAt != null && cached.expiresAt!.isBefore(DateTime.now())) {
       return false;
     }
-    if (p.getString(keyTailKey) != _tail(key)) return false;
+    final storedTail = p.getString(keyTailKey);
+    if (storedTail != null && storedTail != _tail(key)) return false;
     return DateTime.now().difference(cached.checkedAt).inDays <=
         AppConfig.offlineGraceDays;
   }
