@@ -12,10 +12,13 @@ Proyecto para instalar en Android TV / Google TV. La app:
 > *device owner*. Lo que sí se automatiza es la descarga y la apertura del
 > instalador.
 
-> Solo incluí la infraestructura. **No agregué los APKs modificados** del
-> release `v1` (NetFlix Mod+, "Premium", "Sin VPN", etc.) ni mecanismos para
-> saltar suscripciones de terceros. Agregá al catálogo únicamente apps que
-> tengas derecho a distribuir.
+> El catálogo incluye las APKs del release `v1` que confirmaste como propias o
+> autorizadas. Se dejaron afuera las que por nombre son Mod/Premium de terceros
+> (`FCTV33_p`, `Net.Flix.M+`, X-plore de `androforever.com`) y el SmartTube viejo.
+> Agregá al catálogo únicamente apps que tengas derecho a distribuir.
+
+**Manual operativo completo:** [MANUAL.md](MANUAL.md) (claves, pruebas de 2
+días, panel, registro de clientes, cómo agregar APKs y cómo publicar versiones).
 
 ## Estructura
 

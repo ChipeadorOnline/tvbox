@@ -1,4 +1,6 @@
-# Estado del proyecto TV Box
+# Estado del proyecto
+
+Manual operativo completo: [MANUAL.md](MANUAL.md). TV Box
 
 Carpeta: `C:\Users\ChipeadorOnline\Documents\tvbox`
 GitHub: https://github.com/ChipeadorOnline/tvbox
