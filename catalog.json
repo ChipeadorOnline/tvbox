@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-11-27T03:00:00Z",
+  "updatedAt": "2026-11-27T03:30:00Z",
   "apps": [
     {
       "id": "tvbox-updater",
@@ -228,6 +228,18 @@
       "size": 12213247,
       "sha256": "3cef461cf19ad92d87571be6c974f40574f1f72da5ca44965961f1d531dc9dba",
       "notes": "APK del release v1 de tu GitHub. Verificado con aapt2."
+    },
+    {
+      "id": "prueba-refrescar",
+      "name": "PRUEBA - Refrescar",
+      "fileName": "app-release.apk",
+      "packageName": "com.chipeadoronline.tvbox_updater",
+      "url": "https://github.com/ChipeadorOnline/tvbox/releases/download/v1.0.16/app-release.apk",
+      "version": "1.0.16",
+      "versionCode": 16,
+      "size": 51336400,
+      "sha256": "447f1e786d9bd6c2ceb53f7e87ad9550df65e51ff55819295940abee852a4f1a",
+      "notes": "Entrada temporal para probar Refrescar sin actualizar el APK."
     }
   ]
 }
